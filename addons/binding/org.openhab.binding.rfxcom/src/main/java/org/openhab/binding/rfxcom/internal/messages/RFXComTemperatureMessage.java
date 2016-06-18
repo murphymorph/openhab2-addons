@@ -116,7 +116,7 @@ public class RFXComTemperatureMessage extends RFXComBaseMessage {
         byte[] data = new byte[9];
 
         data[0] = 0x08;
-        data[1] = RFXComBaseMessage.PacketType.TEMPERATURE.toByte();
+        data[1] = PacketType.TEMPERATURE.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId & 0xFF00) >> 8);

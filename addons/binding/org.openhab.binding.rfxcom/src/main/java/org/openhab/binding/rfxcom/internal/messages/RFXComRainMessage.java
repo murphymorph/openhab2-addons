@@ -121,7 +121,7 @@ public class RFXComRainMessage extends RFXComBaseMessage {
         byte[] data = new byte[10];
 
         data[0] = 0x0B;
-        data[1] = RFXComBaseMessage.PacketType.RAIN.toByte();
+        data[1] = PacketType.RAIN.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId & 0xFF00) >> 8);

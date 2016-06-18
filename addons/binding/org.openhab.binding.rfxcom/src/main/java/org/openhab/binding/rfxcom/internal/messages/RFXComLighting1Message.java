@@ -158,7 +158,7 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
         byte[] data = new byte[8];
 
         data[0] = 0x07;
-        data[1] = RFXComBaseMessage.PacketType.LIGHTING1.toByte();
+        data[1] = PacketType.LIGHTING1.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) houseCode;

@@ -121,7 +121,7 @@ public class RFXComTransmitterMessage extends RFXComBaseMessage {
         byte[] data = new byte[5];
 
         data[0] = 0x04;
-        data[1] = RFXComBaseMessage.PacketType.TRANSMITTER_MESSAGE.toByte();
+        data[1] = PacketType.TRANSMITTER_MESSAGE.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = response.toByte();

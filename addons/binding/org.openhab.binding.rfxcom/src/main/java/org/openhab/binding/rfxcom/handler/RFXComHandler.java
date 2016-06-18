@@ -30,8 +30,7 @@ import org.openhab.binding.rfxcom.internal.DeviceMessageListener;
 import org.openhab.binding.rfxcom.internal.config.RFXComDeviceConfiguration;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
-import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage;
-import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType;
+import org.openhab.binding.rfxcom.internal.messages.PacketType;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessageFactory;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
     private final int LOW_BATTERY_LEVEL = 1;
 
     ScheduledFuture<?> refreshJob;
-    private RFXComBridgeHandler bridgeHandler;
+    private BaseRFXComBridgeHandler bridgeHandler;
 
     private RFXComDeviceConfiguration config;
 
@@ -119,7 +118,7 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
 
             logger.debug("Bridge initialized");
 
-            bridgeHandler = (RFXComBridgeHandler) thingHandler;
+            bridgeHandler = (BaseRFXComBridgeHandler) thingHandler;
             bridgeHandler.registerDeviceStatusListener(this);
 
             if (config.deviceId == null || config.subType == null) {
@@ -160,14 +159,14 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
         try {
             String id = message.getDeviceId();
             if (config.deviceId.equals(id)) {
-                RFXComBaseMessage msg = (RFXComBaseMessage) message;
-                String receivedId = packetTypeThingMap.get(msg.packetType).getId();
+                PacketType packetType = message.getPacketType();
+                String receivedId = packetTypeThingMap.get(packetType).getId();
 
                 if (receivedId.equals(getThing().getUID().getThingTypeId())) {
                     updateStatus(ThingStatus.ONLINE);
                     logger.debug("Received message from bridge: {} message: {}", bridge, message);
 
-                    List<RFXComValueSelector> supportedValueSelectors = msg.getSupportedInputValueSelectors();
+                    List<RFXComValueSelector> supportedValueSelectors = message.getSupportedInputValueSelectors();
 
                     if (supportedValueSelectors != null) {
                         for (RFXComValueSelector valueSelector : supportedValueSelectors) {

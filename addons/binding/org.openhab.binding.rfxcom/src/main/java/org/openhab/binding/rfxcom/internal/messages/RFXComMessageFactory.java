@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
-import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType;
 
 public class RFXComMessageFactory {
 

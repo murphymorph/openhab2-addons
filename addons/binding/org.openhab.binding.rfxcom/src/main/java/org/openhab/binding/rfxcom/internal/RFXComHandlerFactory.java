@@ -21,6 +21,8 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.openhab.binding.rfxcom.RFXComBindingConstants;
+import org.openhab.binding.rfxcom.handler.BaseRFXComBridgeHandler;
+import org.openhab.binding.rfxcom.handler.HomeduinoBridgeHandler;
 import org.openhab.binding.rfxcom.handler.RFXComBridgeHandler;
 import org.openhab.binding.rfxcom.handler.RFXComHandler;
 import org.openhab.binding.rfxcom.internal.discovery.RFXComDeviceDiscoveryService;
@@ -60,7 +62,11 @@ public class RFXComHandlerFactory extends BaseThingHandlerFactory {
 
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (RFXComBindingConstants.SUPPORTED_BRIDGE_THING_TYPES_UIDS.contains(thingTypeUID)) {
+        if (RFXComBindingConstants.BRIDGE_HOMEDUINO.equals(thingTypeUID)) {
+            HomeduinoBridgeHandler handler = new HomeduinoBridgeHandler((Bridge) thing);
+            registerDeviceDiscoveryService(handler);
+            return handler;
+        } else if (RFXComBindingConstants.SUPPORTED_BRIDGE_THING_TYPES_UIDS.contains(thingTypeUID)) {
             RFXComBridgeHandler handler = new RFXComBridgeHandler((Bridge) thing);
             registerDeviceDiscoveryService(handler);
             return handler;
@@ -82,7 +88,7 @@ public class RFXComHandlerFactory extends BaseThingHandlerFactory {
         }
     }
 
-    private void registerDeviceDiscoveryService(RFXComBridgeHandler handler) {
+    private void registerDeviceDiscoveryService(BaseRFXComBridgeHandler handler) {
         RFXComDeviceDiscoveryService discoveryService = new RFXComDeviceDiscoveryService(handler);
         discoveryService.activate();
         this.discoveryServiceRegs.put(handler.getThing().getUID(), bundleContext

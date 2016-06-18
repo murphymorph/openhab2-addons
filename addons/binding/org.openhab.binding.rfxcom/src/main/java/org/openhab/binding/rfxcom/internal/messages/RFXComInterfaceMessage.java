@@ -283,7 +283,7 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
         byte[] data = new byte[13];
 
         data[0] = 0x0D;
-        data[1] = RFXComBaseMessage.PacketType.INTERFACE_MESSAGE.toByte();
+        data[1] = PacketType.INTERFACE_MESSAGE.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = command.toByte();

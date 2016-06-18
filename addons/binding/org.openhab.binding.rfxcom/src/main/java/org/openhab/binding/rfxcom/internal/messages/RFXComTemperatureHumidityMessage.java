@@ -156,7 +156,7 @@ public class RFXComTemperatureHumidityMessage extends RFXComBaseMessage {
         byte[] data = new byte[11];
 
         data[0] = 0x0A;
-        data[1] = RFXComBaseMessage.PacketType.TEMPERATURE_HUMIDITY.toByte();
+        data[1] = PacketType.TEMPERATURE_HUMIDITY.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId & 0xFF00) >> 8);

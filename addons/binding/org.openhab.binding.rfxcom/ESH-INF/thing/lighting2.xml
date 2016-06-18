@@ -8,6 +8,7 @@
 			<bridge-type-ref id="bridge" />
 			<bridge-type-ref id="RFXtrx433" />
 			<bridge-type-ref id="RFXrec433" />
+            <bridge-type-ref id="Homeduino" />
 		</supported-bridge-type-refs>
 
 		<label>RFXCOM Lighting2 Actuator</label>

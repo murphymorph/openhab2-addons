@@ -112,7 +112,7 @@ public class RFXComWindMessage extends RFXComBaseMessage {
         byte[] data = new byte[16];
 
         data[0] = 0x10;
-        data[1] = RFXComBaseMessage.PacketType.WIND.toByte();
+        data[1] = PacketType.WIND.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId & 0xFF00) >> 8);

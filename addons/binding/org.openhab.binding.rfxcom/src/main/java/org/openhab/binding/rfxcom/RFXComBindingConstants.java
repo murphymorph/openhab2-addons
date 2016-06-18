@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
-import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType;
+import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -37,6 +37,7 @@ public class RFXComBindingConstants {
     public static final String BRIDGE_TYPE_RFXTRX433 = "RFXtrx433";
     public static final String BRIDGE_TYPE_RFXTRX315 = "RFXtrx315";
     public static final String BRIDGE_TYPE_RFXREC433 = "RFXrec433";
+    public static final String BRIDGE_TYPE_HOMEDUINO = "Homeduino";
 
     // Transceiver types
     public static final String TRANSCEIVER_310MHz = "310MHz";
@@ -48,12 +49,13 @@ public class RFXComBindingConstants {
     public final static ThingTypeUID BRIDGE_RFXTRX443 = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_RFXTRX433);
     public final static ThingTypeUID BRIDGE_RFXTRX315 = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_RFXTRX315);
     public final static ThingTypeUID BRIDGE_RFXREC443 = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_RFXREC433);
+    public final static ThingTypeUID BRIDGE_HOMEDUINO = new ThingTypeUID(BINDING_ID, BRIDGE_TYPE_HOMEDUINO);
 
     /**
      * Presents all supported Bridge types by RFXCOM binding.
      */
     public final static Set<ThingTypeUID> SUPPORTED_BRIDGE_THING_TYPES_UIDS = ImmutableSet.of(BRIDGE_MANUAL,
-            BRIDGE_RFXTRX443, BRIDGE_RFXTRX315, BRIDGE_RFXREC443);
+            BRIDGE_RFXTRX443, BRIDGE_RFXTRX315, BRIDGE_RFXREC443, BRIDGE_HOMEDUINO);
 
     /**
      * Presents all discoverable Bridge types by RFXCOM binding.

@@ -16,7 +16,7 @@ import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.openhab.binding.rfxcom.RFXComBindingConstants;
-import org.openhab.binding.rfxcom.handler.RFXComBridgeHandler;
+import org.openhab.binding.rfxcom.handler.BaseRFXComBridgeHandler;
 import org.openhab.binding.rfxcom.internal.DeviceMessageListener;
 import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
@@ -33,9 +33,9 @@ public class RFXComDeviceDiscoveryService extends AbstractDiscoveryService imple
 
     private final static Logger logger = LoggerFactory.getLogger(RFXComDeviceDiscoveryService.class);
 
-    private RFXComBridgeHandler bridgeHandler;
+    private BaseRFXComBridgeHandler bridgeHandler;
 
-    public RFXComDeviceDiscoveryService(RFXComBridgeHandler rfxcomBridgeHandler) {
+    public RFXComDeviceDiscoveryService(BaseRFXComBridgeHandler rfxcomBridgeHandler) {
         super(null, 1, false);
         this.bridgeHandler = rfxcomBridgeHandler;
     }
@@ -64,18 +64,22 @@ public class RFXComDeviceDiscoveryService extends AbstractDiscoveryService imple
         logger.trace("Received: bridge: {} message: {}", bridge, message);
 
         try {
-            RFXComBaseMessage msg = (RFXComBaseMessage) message;
-            String id = message.getDeviceId();
-            ThingTypeUID uid = RFXComBindingConstants.packetTypeThingMap.get(msg.packetType);
-            ThingUID thingUID = new ThingUID(uid, bridge, id.replace(RFXComBaseMessage.ID_DELIMITER, "_"));
-            if (thingUID != null) {
-                logger.trace("Adding new RFXCOM {} with id '{}' to smarthome inbox", thingUID, id);
-                String subType = msg.convertSubType(String.valueOf(msg.subType)).toString();
-                String label = msg.packetType + "-" + id;
-                DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withLabel(label)
-                        .withProperty(RFXComBindingConstants.DEVICE_ID, id)
-                        .withProperty(RFXComBindingConstants.SUB_TYPE, subType).withBridge(bridge).build();
-                thingDiscovered(discoveryResult);
+            if (message instanceof RFXComBaseMessage) {
+                RFXComBaseMessage msg = (RFXComBaseMessage) message;
+                String id = message.getDeviceId();
+                ThingTypeUID uid = RFXComBindingConstants.packetTypeThingMap.get(msg.packetType);
+                ThingUID thingUID = new ThingUID(uid, bridge, id.replace(RFXComBaseMessage.ID_DELIMITER, "_"));
+                if (thingUID != null) {
+                    logger.trace("Adding new RFXCOM {} with id '{}' to smarthome inbox", thingUID, id);
+                    String subType = msg.convertSubType(String.valueOf(msg.subType)).toString();
+                    String label = msg.packetType + "-" + id;
+                    DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withLabel(label)
+                            .withProperty(RFXComBindingConstants.DEVICE_ID, id)
+                            .withProperty(RFXComBindingConstants.SUB_TYPE, subType).withBridge(bridge).build();
+                    thingDiscovered(discoveryResult);
+                }
+            } else {
+                logger.warn("A device, was talking");
             }
         } catch (Exception e) {
             logger.debug("Error occured during device discovery", e);

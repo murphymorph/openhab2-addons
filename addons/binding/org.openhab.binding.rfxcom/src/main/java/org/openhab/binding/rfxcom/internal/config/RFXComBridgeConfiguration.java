@@ -8,6 +8,8 @@
  */
 package org.openhab.binding.rfxcom.internal.config;
 
+import java.math.BigDecimal;
+
 /**
  * Configuration class for {@link RfxcomBinding} device.
  *
@@ -53,4 +55,10 @@ public class RFXComBridgeConfiguration {
     public boolean enableAC;
     public boolean enableARC;
     public boolean enableX10;
+
+    // Homeduino configuration
+    public BigDecimal baudrate;
+    public BigDecimal transmitterPin;
+    public BigDecimal receiverPin;
+
 }

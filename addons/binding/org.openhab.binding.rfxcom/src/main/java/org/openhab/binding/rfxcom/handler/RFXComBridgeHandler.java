@@ -9,23 +9,15 @@
 package org.openhab.binding.rfxcom.handler;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.smarthome.core.thing.Bridge;
-import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
-import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
-import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.rfxcom.RFXComBindingConstants;
 import org.openhab.binding.rfxcom.internal.DeviceMessageListener;
 import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
-import org.openhab.binding.rfxcom.internal.connector.RFXComConnectorInterface;
 import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
 import org.openhab.binding.rfxcom.internal.connector.RFXComJD2XXConnector;
 import org.openhab.binding.rfxcom.internal.connector.RFXComSerialConnector;
@@ -51,67 +43,18 @@ import gnu.io.NoSuchPortException;
  *
  * @author Pauli Anttila - Initial contribution
  */
-public class RFXComBridgeHandler extends BaseBridgeHandler {
+public class RFXComBridgeHandler extends BaseRFXComBridgeHandler {
 
     private Logger logger = LoggerFactory.getLogger(RFXComBridgeHandler.class);
-
-    RFXComConnectorInterface connector = null;
-    private MessageListener eventListener = new MessageListener();
-
-    private List<DeviceMessageListener> deviceStatusListeners = new CopyOnWriteArrayList<>();
 
     private static final int timeout = 5000;
     private static byte seqNbr = 0;
     private static RFXComTransmitterMessage responseMessage = null;
     private Object notifierObject = new Object();
-    private RFXComBridgeConfiguration configuration = null;
-    private ScheduledFuture<?> connectorTask;
 
     public RFXComBridgeHandler(Bridge br) {
         super(br);
-    }
-
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.debug("Bridge commands not supported.");
-    }
-
-    @Override
-    public void dispose() {
-        logger.debug("Handler disposed.");
-
-        if (connector != null) {
-            connector.removeEventListener(eventListener);
-            connector.disconnect();
-        }
-
-        if (connectorTask != null && !connectorTask.isCancelled()) {
-            connectorTask.cancel(true);
-            connectorTask = null;
-        }
-
-        super.dispose();
-    }
-
-    @Override
-    public void initialize() {
-        logger.debug("Initializing RFXCOM bridge handler");
-        updateStatus(ThingStatus.OFFLINE);
-
-        configuration = getConfigAs(RFXComBridgeConfiguration.class);
-
-        if (connectorTask == null || connectorTask.isCancelled()) {
-            connectorTask = scheduler.scheduleAtFixedRate(new Runnable() {
-
-                @Override
-                public void run() {
-                    logger.debug("Checking RFXCOM transceiver connection, thing status = {}", thing.getStatus());
-                    if (thing.getStatus() != ThingStatus.ONLINE) {
-                        connect();
-                    }
-                }
-            }, 0, 60, TimeUnit.SECONDS);
-        }
+        this.setMessageListener(new MessageListener());
     }
 
     private static synchronized byte getSeqNumber() {
@@ -134,7 +77,8 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
         responseMessage = respMessage;
     }
 
-    private void connect() {
+    @Override
+    protected void connect() {
         logger.debug("Connecting to RFXCOM transceiver");
 
         try {
@@ -162,7 +106,7 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
                 // controller does not response immediately after reset,
                 // so wait a while
                 Thread.sleep(300);
-                connector.addEventListener(eventListener);
+                connector.addEventListener(this.getEventListener());
 
                 logger.debug("Get status of controller");
                 connector.sendMessage(RFXComMessageFactory.CMD_GET_STATUS);
@@ -300,6 +244,7 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
         throw new IllegalArgumentException("");
     }
 
+    @Override
     public synchronized void sendMessage(RFXComMessage msg) throws RFXComException {
 
         ((RFXComBaseMessage) msg).seqNbr = getNextSeqNumber();
@@ -379,7 +324,7 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
 
                 } else {
 
-                    for (DeviceMessageListener deviceStatusListener : deviceStatusListeners) {
+                    for (DeviceMessageListener deviceStatusListener : getDeviceStatusListeners()) {
                         try {
                             deviceStatusListener.onDeviceMessageReceived(getThing().getUID(), message);
                         } catch (Exception e) {
@@ -403,19 +348,4 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
         }
     }
-
-    public boolean registerDeviceStatusListener(DeviceMessageListener deviceStatusListener) {
-        if (deviceStatusListener == null) {
-            throw new IllegalArgumentException("It's not allowed to pass a null deviceStatusListener.");
-        }
-        return deviceStatusListeners.add(deviceStatusListener);
-    }
-
-    public boolean unregisterDeviceStatusListener(DeviceMessageListener deviceStatusListener) {
-        if (deviceStatusListener == null) {
-            throw new IllegalArgumentException("It's not allowed to pass a null deviceStatusListener.");
-        }
-        return deviceStatusListeners.remove(deviceStatusListener);
-    }
-
 }

@@ -154,7 +154,7 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
         byte[] data = new byte[12];
 
         data[0] = 0x0B;
-        data[1] = RFXComBaseMessage.PacketType.LIGHTING2.toByte();
+        data[1] = PacketType.LIGHTING2.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId >> 24) & 0xFF);

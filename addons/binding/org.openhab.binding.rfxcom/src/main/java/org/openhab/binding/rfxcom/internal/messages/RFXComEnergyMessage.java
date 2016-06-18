@@ -126,7 +126,7 @@ public class RFXComEnergyMessage extends RFXComBaseMessage {
         byte[] data = new byte[17];
 
         data[0] = 0x11;
-        data[1] = RFXComBaseMessage.PacketType.ENERGY.toByte();
+        data[1] = PacketType.ENERGY.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
 

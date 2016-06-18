@@ -142,7 +142,7 @@ public class RFXComRfyMessage extends RFXComBaseMessage {
         final byte[] data = new byte[13];
 
         data[0] = 12;
-        data[1] = RFXComBaseMessage.PacketType.RFY.toByte();
+        data[1] = PacketType.RFY.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((unitId >> 16) & 0xFF);

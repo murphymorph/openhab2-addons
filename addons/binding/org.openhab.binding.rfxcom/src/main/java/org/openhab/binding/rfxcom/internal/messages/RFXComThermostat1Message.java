@@ -159,7 +159,7 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
         byte[] data = new byte[10];
 
         data[0] = 0x08;
-        data[1] = RFXComBaseMessage.PacketType.THERMOSTAT1.toByte();
+        data[1] = PacketType.THERMOSTAT1.toByte();
         data[2] = subType.toByte();
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId & 0xFF00) >> 8);
