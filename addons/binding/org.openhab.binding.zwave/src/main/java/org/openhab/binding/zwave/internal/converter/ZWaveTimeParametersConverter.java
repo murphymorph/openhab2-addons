@@ -9,6 +9,7 @@
 package org.openhab.binding.zwave.internal.converter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -71,8 +72,8 @@ public class ZWaveTimeParametersConverter extends ZWaveCommandClassConverter {
     public State handleEvent(ZWaveThingChannel channel, ZWaveCommandClassValueEvent event) {
         int offsetAllowed = Integer.MAX_VALUE;
         String offsetString = channel.getArguments().get("config_offset");
-        if (offsetString != null && Integer.parseInt(offsetString) != 0) {
-            offsetAllowed = Integer.parseInt(offsetString);
+        if (offsetString != null && Double.valueOf(offsetString) != 0) {
+            offsetAllowed = Double.valueOf(offsetString).intValue();
         }
 
         State state = null;
@@ -91,8 +92,8 @@ public class ZWaveTimeParametersConverter extends ZWaveCommandClassConverter {
                     ZWaveTimeParametersCommandClass commandClass = (ZWaveTimeParametersCommandClass) node
                             .resolveCommandClass(ZWaveCommandClass.CommandClass.TIME_PARAMETERS, channel.getEndpoint());
 
-                    SerialMessage serialMessage = node.encapsulate(commandClass.getSetMessage(new Date()), commandClass,
-                            channel.getEndpoint());
+                    SerialMessage serialMessage = node.encapsulate(commandClass.getSetMessage(Calendar.getInstance()),
+                            commandClass, channel.getEndpoint());
                     if (serialMessage == null) {
                         logger.warn("Generating message failed for command class = {}, node = {}, endpoint = {}",
                                 commandClass.getCommandClass().getLabel(), node.getNodeId(), channel.getEndpoint());
@@ -135,7 +136,7 @@ public class ZWaveTimeParametersConverter extends ZWaveCommandClassConverter {
         ZWaveTimeParametersCommandClass commandClass = (ZWaveTimeParametersCommandClass) node
                 .resolveCommandClass(ZWaveCommandClass.CommandClass.TIME_PARAMETERS, channel.getEndpoint());
 
-        SerialMessage serialMessage = node.encapsulate(commandClass.getSetMessage(new Date()), commandClass,
+        SerialMessage serialMessage = node.encapsulate(commandClass.getSetMessage(Calendar.getInstance()), commandClass,
                 channel.getEndpoint());
         if (serialMessage == null) {
             logger.warn("Generating message failed for command class = {}, node = {}, endpoint = {}",
