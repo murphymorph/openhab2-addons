@@ -54,7 +54,57 @@ public class RFXComBridgeHandler extends BaseRFXComBridgeHandler {
 
     public RFXComBridgeHandler(Bridge br) {
         super(br);
+<<<<<<< HEAD
         this.setMessageListener(new MessageListener());
+=======
+    }
+
+    @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        logger.debug("Bridge commands not supported.");
+    }
+
+    @Override
+    public void dispose() {
+        logger.debug("Handler disposed.");
+
+        for (DeviceMessageListener deviceStatusListener : deviceStatusListeners) {
+            unregisterDeviceStatusListener(deviceStatusListener);
+        }
+
+        if (connector != null) {
+            connector.removeEventListener(eventListener);
+            connector.disconnect();
+        }
+
+        if (connectorTask != null && !connectorTask.isCancelled()) {
+            connectorTask.cancel(true);
+            connectorTask = null;
+        }
+
+        super.dispose();
+    }
+
+    @Override
+    public void initialize() {
+        logger.debug("Initializing RFXCOM bridge handler");
+        updateStatus(ThingStatus.OFFLINE);
+
+        configuration = getConfigAs(RFXComBridgeConfiguration.class);
+
+        if (connectorTask == null || connectorTask.isCancelled()) {
+            connectorTask = scheduler.scheduleAtFixedRate(new Runnable() {
+
+                @Override
+                public void run() {
+                    logger.debug("Checking RFXCOM transceiver connection, thing status = {}", thing.getStatus());
+                    if (thing.getStatus() != ThingStatus.ONLINE) {
+                        connect();
+                    }
+                }
+            }, 0, 60, TimeUnit.SECONDS);
+        }
+>>>>>>> master
     }
 
     private static synchronized byte getSeqNumber() {
@@ -153,7 +203,7 @@ public class RFXComBridgeHandler extends BaseRFXComBridgeHandler {
         } catch (NoSuchPortException e) {
             logger.error("Connection to RFXCOM transceiver failed: invalid port");
         } catch (Exception e) {
-            logger.error("Connection to RFXCOM transceiver failed: {}", e.getMessage());
+            logger.error("Connection to RFXCOM transceiver failed", e);
         } catch (UnsatisfiedLinkError e) {
             logger.error("Error occured when trying to load native library for OS '{}' version '{}', processor '{}'",
                     System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"), e);
@@ -348,4 +398,23 @@ public class RFXComBridgeHandler extends BaseRFXComBridgeHandler {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
         }
     }
+<<<<<<< HEAD
+=======
+
+    public boolean registerDeviceStatusListener(DeviceMessageListener deviceStatusListener) {
+        if (deviceStatusListener == null) {
+            throw new IllegalArgumentException("It's not allowed to pass a null deviceStatusListener.");
+        }
+        return deviceStatusListeners.contains(deviceStatusListener) ? false
+                : deviceStatusListeners.add(deviceStatusListener);
+    }
+
+    public boolean unregisterDeviceStatusListener(DeviceMessageListener deviceStatusListener) {
+        if (deviceStatusListener == null) {
+            throw new IllegalArgumentException("It's not allowed to pass a null deviceStatusListener.");
+        }
+        return deviceStatusListeners.remove(deviceStatusListener);
+    }
+
+>>>>>>> master
 }
