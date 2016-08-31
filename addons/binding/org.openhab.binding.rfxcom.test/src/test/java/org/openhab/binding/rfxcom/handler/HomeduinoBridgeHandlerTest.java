@@ -47,6 +47,9 @@ public class HomeduinoBridgeHandlerTest {
         constructSubject(defaultProperties(true));
 
         subject.connect();
+
+        connector.mockReceiveMessage("ready");
+
         subject.dispose();
 
         Assert.assertThat(connector.isConnectCalled(), Is.is(false));
@@ -121,7 +124,7 @@ public class HomeduinoBridgeHandlerTest {
         }
 
         @Override
-        public void changeThingType(Thing thing, ThingTypeUID thingTypeUID, Configuration configuration) {
+        public void migrateThingType(Thing thing, ThingTypeUID thingTypeUID, Configuration configuration) {
             // TODO Auto-generated method stub
 
         }

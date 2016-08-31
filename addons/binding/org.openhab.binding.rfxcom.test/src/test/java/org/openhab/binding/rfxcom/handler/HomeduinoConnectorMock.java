@@ -13,7 +13,7 @@ public class HomeduinoConnectorMock implements HomeduinoConnectorInterface {
     private boolean connectCalled;
     private boolean connect2Called;
 
-    private List<String> receivedMessages = new ArrayList<>();
+    private List<String> receivedMessages = new ArrayList<String>();
 
     private static List<RFXComEventListener> _listeners = new ArrayList<RFXComEventListener>();
 

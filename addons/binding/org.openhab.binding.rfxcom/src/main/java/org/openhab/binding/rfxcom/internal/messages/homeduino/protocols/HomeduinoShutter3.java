@@ -1,6 +1,13 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
 import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.smarthome.core.types.State;
+import org.eclipse.smarthome.core.types.Type;
+import org.openhab.binding.rfxcom.RFXComValueSelector;
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
+import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
 public class HomeduinoShutter3 extends HomeduinoProtocol {
     private static final int PULSE_COUNT = 82;
@@ -26,23 +33,10 @@ public class HomeduinoShutter3 extends HomeduinoProtocol {
             output.append(c);
         }
 
-        System.out.println(output);
-
-        int id = Integer.parseInt(output.substring(0, 29).toString(), 2);
-        int channel = Integer.parseInt(output.substring(29, 32).toString(), 2);
-        int state = Integer.parseInt(output.substring(33, 36).toString(), 2);
+        int id = Integer.parseInt(output.substring(0, 29), 2);
+        int channel = Integer.parseInt(output.substring(29, 32), 2);
+        int state = Integer.parseInt(output.substring(33, 36), 2);
 
         return new Result(id, channel, state, false, null);
     }
-
-    @Override
-    public Result process(Pulses pulses) {
-        System.out.println(pulses.getPulseCount());
-        System.out.println(pulses.getPulses());
-        System.out.println(Arrays.toString(pulses.getPulseLengths()));
-        System.out.println("got here");
-
-        return process(pulses.getPulses());
-    }
-
 }

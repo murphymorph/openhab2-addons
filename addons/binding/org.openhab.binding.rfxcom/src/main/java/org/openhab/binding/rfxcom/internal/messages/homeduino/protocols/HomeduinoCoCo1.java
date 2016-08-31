@@ -30,9 +30,4 @@ public abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
 
         return new Result(id, unit, state, false, null);
     }
-
-    @Override
-    public Result process(Pulses pulses) {
-        return process(pulses.getPulses());
-    }
 }

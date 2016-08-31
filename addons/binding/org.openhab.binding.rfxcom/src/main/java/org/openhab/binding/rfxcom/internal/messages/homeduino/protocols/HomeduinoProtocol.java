@@ -10,7 +10,7 @@ import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class HomeduinoProtocol implements RFXComMessage {
+public abstract class HomeduinoProtocol {
     private static Logger LOGGER = LoggerFactory.getLogger(HomeduinoProtocol.class);
     private int pulseCount;
     private int[] pulseLengths;
@@ -80,7 +80,7 @@ public abstract class HomeduinoProtocol implements RFXComMessage {
     /**
      * See: https://github.com/pimatic/rfcontroljs/blob/master/src/controller.coffee
      *
-     * @param data
+     * @param pulses
      * @return
      */
     private static Pulses fixPulses(Pulses pulses) {
@@ -150,14 +150,11 @@ public abstract class HomeduinoProtocol implements RFXComMessage {
         return true;
     }
 
-    @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new UnsupportedOperationException("Setting the device id is not supported");
-    }
-
     abstract public Result process(String pulses);
 
-    abstract public Result process(Pulses pulses);
+    public Result process(Pulses pulses) {
+        return process(pulses.getPulses());
+    }
 
     public static class Pulses {
         private final int[] pulseLengths;
@@ -196,6 +193,10 @@ public abstract class HomeduinoProtocol implements RFXComMessage {
             this.state = state;
             this.all = all;
             this.dimlevel = dimlevel;
+        }
+
+        public HomeduinoProtocol getProtocol(){
+            return HomeduinoProtocol.this;
         }
 
         public int getId() {

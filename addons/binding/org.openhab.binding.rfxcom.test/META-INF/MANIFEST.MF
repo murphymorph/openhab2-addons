@@ -6,23 +6,18 @@ Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Openhab
 Fragment-Host: org.openhab.binding.rfxcom
-Import-Package: org.openhab.binding.rfxcom,
+Import-Package: 
  org.slf4j,
  org.apache.commons.lang.reflect,
- groovy.json,
- groovy.lang,
- org.codehaus.groovy.reflection,
- org.codehaus.groovy.runtime,
- org.codehaus.groovy.runtime.callsite,
- org.codehaus.groovy.runtime.typehandling,
  org.eclipse.smarthome.core.events,
- org.eclipse.smarthome.core.thing.setup,
  org.eclipse.smarthome.core.thing.util,
  org.eclipse.smarthome.test,
  org.eclipse.smarthome.test.storage,
  org.hamcrest;core=split,
+ org.openhab.binding.rfxcom,
  org.osgi.service.device
-Require-Bundle: org.junit;bundle-version="4.11.0"
-Export-Package: org.openhab.binding.rfxcom.internal;x-internal:=true,
- org.openhab.binding.rfxcom.test;uses:="org.eclipse.smarthome.test"
+Require-Bundle: 
+ org.junit;bundle-version="4.11.0"
+Export-Package: org.openhab.binding.rfxcom.handler,
+ org.openhab.binding.rfxcom.internal.messages.homeduino;x-internal:=true
 

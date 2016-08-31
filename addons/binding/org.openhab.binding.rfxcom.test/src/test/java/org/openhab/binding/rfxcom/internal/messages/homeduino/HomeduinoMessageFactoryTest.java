@@ -7,11 +7,13 @@ import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
+import org.eclipse.smarthome.core.types.UnDefType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands;
+import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
 
 public class HomeduinoMessageFactoryTest {
     private static final String RF_EVENT = "RF receive 284 2800 1352 10760 0 0 0 0 010002020000020002000200020200020000020200000200020200000200020002020002000200020002000200020002000200000202000002000200020002000203";
@@ -30,11 +32,13 @@ public class HomeduinoMessageFactoryTest {
     public void testHomeduinoMessage() throws Exception {
         HomeduinoMessage result = HomeduinoMessageFactory.createMessage(RF_EVENT.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals(rfEvent.getDeviceId(), "17638398.0");
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.COMMAND), OnOffType.OFF);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals(event.getDeviceId(), "17638398.0");
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.OFF);
     }
 
     @Test
@@ -42,11 +46,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENT_DIM.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("9565958.0", rfEvent.getDeviceId());
-        Assert.assertEquals(new PercentType(100), rfEvent.convertToCommand(RFXComValueSelector.DIMMING_LEVEL));
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("9565958.0", event.getDeviceId());
+        Assert.assertEquals(new PercentType(100), event.convertToState(RFXComValueSelector.DIMMING_LEVEL));
     }
 
     @Test
@@ -54,11 +60,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENT_DOORBEL.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("4.14", rfEvent.getDeviceId());
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.CONTACT), OpenClosedType.OPEN);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("4.14", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.CONTACT), OpenClosedType.OPEN);
     }
 
     @Test
@@ -66,11 +74,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENT_OLD_COCO.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("2.20", rfEvent.getDeviceId());
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.COMMAND), OnOffType.ON);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("2.20", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.COMMAND), OnOffType.ON);
     }
 
     @Test
@@ -78,11 +88,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENTS_SHUTTER_UP.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("65542026.1", rfEvent.getDeviceId());
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.SHUTTER), UpDownType.UP);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("65542026.1", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.SHUTTER), UpDownType.UP);
     }
 
     @Test
@@ -90,11 +102,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENTS_SHUTTER_UP_2.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("65542026.1", rfEvent.getDeviceId());
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.SHUTTER), UpDownType.UP);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("65542026.1", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.SHUTTER), UpDownType.UP);
     }
 
     @Test
@@ -102,11 +116,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENTS_SHUTTER_DOWN.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("65542026.1", rfEvent.getDeviceId());
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.SHUTTER), UpDownType.DOWN);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("65542026.1", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.SHUTTER), UpDownType.DOWN);
     }
 
     @Test
@@ -114,11 +130,13 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENTS_SHUTTER_STOP.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
-        Assert.assertTrue(result instanceof HomeduinoMessage);
+        Assert.assertTrue(result instanceof HomeduinoEventMessage);
 
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
-        Assert.assertEquals("384309098.1", rfEvent.getDeviceId());
-        Assert.assertEquals(rfEvent.convertToCommand(RFXComValueSelector.SHUTTER), StopMoveType.STOP);
+        RFXComMessage event = rfEvent.getInterpretations().get(0);
+
+        Assert.assertEquals("384309098.1", event.getDeviceId());
+        Assert.assertEquals(event.convertToState(RFXComValueSelector.SHUTTER), UnDefType.UNDEF);
     }
 
     @Test

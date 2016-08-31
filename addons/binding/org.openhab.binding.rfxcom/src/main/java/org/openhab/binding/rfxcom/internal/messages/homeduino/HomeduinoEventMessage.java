@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HomeduinoEventMessage extends HomeduinoBaseMessage {
-    private Logger logger = LoggerFactory.getLogger(HomeduinoEventMessage.class);
+    private final byte[] data;
 
-    private Result result;
+    private Logger logger = LoggerFactory.getLogger(HomeduinoEventMessage.class);
 
     private final static List<RFXComValueSelector> supportedInputValueSelectors = Arrays
             .asList(RFXComValueSelector.COMMAND, RFXComValueSelector.CONTACT);
@@ -39,10 +39,6 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
             .asList(RFXComValueSelector.COMMAND);
 
     private final static List<HomeduinoProtocol> SUPPORTED_PROTOCOLS = initializeProtocols();
-
-    public HomeduinoEventMessage() {
-        super(PacketType.HOMEDUINO_RF_EVENT);
-    }
 
     private static List<HomeduinoProtocol> initializeProtocols() {
         List<HomeduinoProtocol> result = new ArrayList<>();
@@ -56,32 +52,7 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
 
     public HomeduinoEventMessage(byte[] data) {
         super(PacketType.HOMEDUINO_RF_EVENT);
-        encodeMessage(data);
-    }
-
-    public void encodeMessage(byte[] data) {
-        // the result is a compressed set of timings (from rfcontrol https://github.com/pimatic/RFControl)
-        // the first 8 numbers are buckets which refer to pulse lengths,
-        // all the other values refer back to these buckets.
-
-        // the strategy we use here is based on the strategy described for rfcontroljs
-        String value = new String(data, StandardCharsets.US_ASCII);
-        Pattern p = Pattern.compile(".*? (([0-9]+ ){8})(([0-7][0-7])+)$");
-        Matcher m = p.matcher(value);
-
-        System.out.println(value);
-
-        if (m.matches()) {
-            HomeduinoProtocol.Pulses pulses = HomeduinoProtocol.prepareAndFixCompressedPulses(data);
-
-            for (HomeduinoProtocol protocol : SUPPORTED_PROTOCOLS) {
-                if (protocol.matches(pulses)) {
-                    result = protocol.process(pulses);
-                }
-            }
-        } else {
-            logger.warn("Panic: could not parse message");
-        }
+        this.data = data;
     }
 
     public byte[] decodeMessage() {
@@ -139,26 +110,6 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         return String.format("%" + width + "s", Integer.toBinaryString(number)).replace(' ', '0');
     }
 
-    public Command convertToCommand(RFXComValueSelector valueSelector) throws RFXComException {
-        if (valueSelector == RFXComValueSelector.DIMMING_LEVEL) {
-            return RFXComLighting2Message.getPercentTypeFromDimLevel(result.getDimlevel());
-        } else if (valueSelector == RFXComValueSelector.COMMAND) {
-            return result.getState() == 0 ? OnOffType.OFF : OnOffType.ON;
-        } else if (valueSelector == RFXComValueSelector.CONTACT) {
-            return result.getState() == 0 ? OpenClosedType.CLOSED : OpenClosedType.OPEN;
-        } else if (valueSelector == RFXComValueSelector.SHUTTER) {
-            if (result.getState() == 1) {
-                return UpDownType.UP;
-            } else if (result.getState() == 3) {
-                return UpDownType.DOWN;
-            } else {
-                return StopMoveType.STOP;
-            }
-        }
-
-        throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
-    }
-
     public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
         return supportedInputValueSelectors;
     }
@@ -167,7 +118,7 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         return supportedOutputValueSelectors;
     }
 
-    public String getDeviceId() throws RFXComException {
+    public String getDeviceId(Result result) throws RFXComException {
         return result.getId() + "." + result.getUnit();
     }
 
@@ -177,7 +128,31 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
     }
 
     public List<RFXComMessage> getInterpretations() {
-        System.out.println("implement me!!!");
-        throw new UnsupportedOperationException("implement me!!!");
+        List<RFXComMessage> list = new ArrayList<>();
+
+        // the result is a compressed set of timings (from rfcontrol https://github.com/pimatic/RFControl)
+        // the first 8 numbers are buckets which refer to pulse lengths,
+        // all the other values refer back to these buckets.
+
+        // the strategy we use here is based on the strategy described for rfcontroljs
+        String value = new String(data, StandardCharsets.US_ASCII);
+        Pattern p = Pattern.compile(".*? (([0-9]+ ){8})(([0-7][0-7])+)$");
+        Matcher m = p.matcher(value);
+
+        System.out.println(value);
+
+        if (m.matches()) {
+            HomeduinoProtocol.Pulses pulses = HomeduinoProtocol.prepareAndFixCompressedPulses(data);
+
+            for (HomeduinoProtocol protocol : SUPPORTED_PROTOCOLS) {
+                if (protocol.matches(pulses)) {
+                    list.add(new RFXComHomeduinoMessage(protocol.process(pulses)));
+                }
+            }
+        } else {
+            logger.warn("Panic: could not parse message");
+        }
+
+        return list;
     }
 }
