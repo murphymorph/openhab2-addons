@@ -1,12 +1,8 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class HomeduinoSwitch1 extends HomeduinoCoCo2 {
-    private Logger logger = LoggerFactory.getLogger(HomeduinoSwitch1.class);
-
+public final class HomeduinoSwitch1 extends HomeduinoCoCo2 {
     private static int PULSE_COUNT = 132;
 
     public HomeduinoSwitch1() {

@@ -2,7 +2,7 @@ package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
-public class HomeduinoShutter3 extends HomeduinoProtocol {
+public final class HomeduinoShutter3 extends HomeduinoProtocol {
     private static final int PULSE_COUNT = 82;
     private static final int[] PULSE_LENGTHS = { 366, 736, 1600, 5204, 10896 };
 

@@ -6,11 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class HomeduinoProtocol {
-    private static Logger LOGGER = LoggerFactory.getLogger(HomeduinoProtocol.class);
     private int pulseCount;
     private int[] pulseLengths;
 
