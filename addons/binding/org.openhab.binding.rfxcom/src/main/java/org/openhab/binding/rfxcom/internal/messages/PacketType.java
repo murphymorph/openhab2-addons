@@ -50,8 +50,14 @@ public enum PacketType {
     HOMEDUINO_ACK(193),
     HOMEDUINO_ERROR(194),
     HOMEDUINO_RF_EVENT(195),
+    HOMEDUINO_SWITCH1(195),
+    HOMEDUINO_SWITCH4(195),
+    HOMEDUINO_DIMMER1(195),
 
-    UNKNOWN(255);
+    HOMEDUINO_PIR1(195),
+    HOMEDUINO_SHUTTER3(195),
+
+    UNKNOWN(255),;
 
     private final int packetType;
 

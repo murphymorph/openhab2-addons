@@ -68,6 +68,13 @@ public interface RFXComMessage {
     Object convertSubType(String subType) throws RFXComException;
 
     /**
+     * Procedure for converting the internal subtype to sub type object.
+     *
+     * @throws RFXComException
+     */
+    Object convertSubType() throws RFXComException;
+
+    /**
      * Procedure to set sub type.
      *
      */

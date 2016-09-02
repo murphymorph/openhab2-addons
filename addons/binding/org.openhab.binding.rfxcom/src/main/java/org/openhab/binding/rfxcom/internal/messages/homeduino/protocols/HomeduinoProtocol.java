@@ -5,8 +5,7 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
-import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
+import org.openhab.binding.rfxcom.internal.messages.PacketType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,12 +142,14 @@ public abstract class HomeduinoProtocol {
         for (int i = 0; i < length; i++) {
             int delta = sourcePulseLengths[i] - targetPulseLengths[i];
             double deviation = (double) delta / sourcePulseLengths[i];
-            if (deviation > 0.1) {
+            if (deviation > 0.15) {
                 return false;
             }
         }
         return true;
     }
+
+    abstract public PacketType getPacketType();
 
     abstract public Result process(String pulses);
 
@@ -195,7 +196,7 @@ public abstract class HomeduinoProtocol {
             this.dimlevel = dimlevel;
         }
 
-        public HomeduinoProtocol getProtocol(){
+        public HomeduinoProtocol getProtocol() {
             return HomeduinoProtocol.this;
         }
 
@@ -217,6 +218,10 @@ public abstract class HomeduinoProtocol {
 
         public Integer getDimlevel() {
             return dimlevel;
+        }
+
+        public PacketType getPacketType() {
+            return getProtocol().getPacketType();
         }
 
     }

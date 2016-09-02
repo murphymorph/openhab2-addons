@@ -1,12 +1,5 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.eclipse.smarthome.core.types.State;
-import org.eclipse.smarthome.core.types.Type;
-import org.openhab.binding.rfxcom.RFXComValueSelector;
-import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
 public class HomeduinoShutter3 extends HomeduinoProtocol {
@@ -38,5 +31,10 @@ public class HomeduinoShutter3 extends HomeduinoProtocol {
         int state = Integer.parseInt(output.substring(33, 36), 2);
 
         return new Result(id, channel, state, false, null);
+    }
+
+    @Override
+    public PacketType getPacketType() {
+        return PacketType.HOMEDUINO_SHUTTER3;
     }
 }

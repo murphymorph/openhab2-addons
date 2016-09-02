@@ -133,6 +133,11 @@ public class RFXComBindingConstants {
     public final static ThingTypeUID THING_TYPE_RFX_METER = new ThingTypeUID(BINDING_ID, "rfxmeter");
     public final static ThingTypeUID THING_TYPE_FS20 = new ThingTypeUID(BINDING_ID, "fs20");
     public final static ThingTypeUID THING_TYPE_RFY = new ThingTypeUID(BINDING_ID, "rfy");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH1 = new ThingTypeUID(BINDING_ID, "homeduino_switch1");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH4 = new ThingTypeUID(BINDING_ID, "homeduino_switch4");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_DIMMER1 = new ThingTypeUID(BINDING_ID, "homeduino_dommer1");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_PIR1 = new ThingTypeUID(BINDING_ID, "homeduino_pir1");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_SHUTTER3 = new ThingTypeUID(BINDING_ID, "homeduino_shutter3");
 
     /**
      * Presents all supported Thing types by RFXCOM binding.
@@ -152,7 +157,7 @@ public class RFXComBindingConstants {
      * Map RFXCOM packet types to RFXCOM Thing types and vice versa.
      */
     public final static Map<PacketType, ThingTypeUID> packetTypeThingMap = ImmutableMap
-            .<PacketType, ThingTypeUID> builder()
+            .<PacketType, ThingTypeUID>builder()
             .put(PacketType.BAROMETRIC, RFXComBindingConstants.THING_TYPE_BAROMETRIC)
             .put(PacketType.BBQ1, RFXComBindingConstants.THING_TYPE_BBQ_TEMPERATURE)
             .put(PacketType.BLINDS1, RFXComBindingConstants.THING_TYPE_BLINDS1)
@@ -190,5 +195,10 @@ public class RFXComBindingConstants {
             .put(PacketType.UV, RFXComBindingConstants.THING_TYPE_UV)
             .put(PacketType.WATER, RFXComBindingConstants.THING_TYPE_WATER_USAGE)
             .put(PacketType.WEIGHT, RFXComBindingConstants.THING_TYPE_WEIGHTING_SCALE)
-            .put(PacketType.WIND, RFXComBindingConstants.THING_TYPE_WIND).build();
+            .put(PacketType.WIND, RFXComBindingConstants.THING_TYPE_WIND)
+            .put(PacketType.HOMEDUINO_SWITCH1, RFXComBindingConstants.THING_TYPE_HOMEDUINO_SWITCH1)
+            .put(PacketType.HOMEDUINO_SWITCH4, RFXComBindingConstants.THING_TYPE_HOMEDUINO_SWITCH4)
+            .put(PacketType.HOMEDUINO_DIMMER1, RFXComBindingConstants.THING_TYPE_HOMEDUINO_DIMMER1)
+            .put(PacketType.HOMEDUINO_PIR1, RFXComBindingConstants.THING_TYPE_HOMEDUINO_PIR1)
+            .put(PacketType.HOMEDUINO_SHUTTER3, RFXComBindingConstants.THING_TYPE_HOMEDUINO_SHUTTER3).build();
 }

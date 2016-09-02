@@ -10,6 +10,8 @@ package org.openhab.binding.rfxcom.internal.messages;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
+
 /**
  * Base class for RFXCOM data classes. All other data classes should extend this class.
  *
@@ -85,4 +87,10 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
     public PacketType getPacketType() {
         return this.packetType;
     }
+
+    @Override
+    public Object convertSubType() throws RFXComException {
+        return convertSubType(String.valueOf(this.subType));
+    }
+
 }

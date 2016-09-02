@@ -64,22 +64,21 @@ public class RFXComDeviceDiscoveryService extends AbstractDiscoveryService imple
         logger.trace("Received: bridge: {} message: {}", bridge, message);
 
         try {
-            if (message instanceof RFXComBaseMessage) {
-                RFXComBaseMessage msg = (RFXComBaseMessage) message;
+            if (message instanceof RFXComMessage) {
                 String id = message.getDeviceId();
-                ThingTypeUID uid = RFXComBindingConstants.packetTypeThingMap.get(msg.packetType);
+                ThingTypeUID uid = RFXComBindingConstants.packetTypeThingMap.get(message.getPacketType());
                 ThingUID thingUID = new ThingUID(uid, bridge, id.replace(RFXComBaseMessage.ID_DELIMITER, "_"));
                 if (thingUID != null) {
                     logger.trace("Adding new RFXCOM {} with id '{}' to smarthome inbox", thingUID, id);
-                    String subType = msg.convertSubType(String.valueOf(msg.subType)).toString();
-                    String label = msg.packetType + "-" + id;
+                    String subType = message.convertSubType().toString();
+                    String label = message.getPacketType() + "-" + id;
                     DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withLabel(label)
                             .withProperty(RFXComBindingConstants.DEVICE_ID, id)
                             .withProperty(RFXComBindingConstants.SUB_TYPE, subType).withBridge(bridge).build();
                     thingDiscovered(discoveryResult);
                 }
             } else {
-                logger.warn("A device, was talking");
+                logger.warn("An unsupported device, was talking");
             }
         } catch (Exception e) {
             logger.debug("Error occured during device discovery", e);
