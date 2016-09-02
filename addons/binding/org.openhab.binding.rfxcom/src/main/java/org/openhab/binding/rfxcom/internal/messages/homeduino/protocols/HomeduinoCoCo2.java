@@ -41,7 +41,13 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
         if (stateChar != 'N') {
             state = Character.getNumericValue(stateChar);
         }
-        int unit = Integer.parseInt(output.substring(28, 32).toString(), 2);
+        int unit;
+        if (all) {
+            unit = 0;
+        } else {
+            unit = Integer.parseInt(output.substring(28, 32).toString(), 2) + 1;
+        }
+
         Integer dimlevel = null;
         if (pulseCount > 132) {
             dimlevel = Integer.parseInt(output.substring(32).toString(), 2);
