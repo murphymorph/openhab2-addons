@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -163,10 +162,6 @@ public class RFXComJD2XXConnector implements RFXComConnectorInterface {
                 while (interrupted != true) {
 
                     if ((len = in.read(tmpData)) > 0) {
-
-                        byte[] logData = Arrays.copyOf(tmpData, len);
-                        logger.trace("Received data (len={}): {}", len, DatatypeConverter.printHexBinary(logData));
-
                         for (int i = 0; i < len; i++) {
 
                             if (index > dataBufferMaxLen) {

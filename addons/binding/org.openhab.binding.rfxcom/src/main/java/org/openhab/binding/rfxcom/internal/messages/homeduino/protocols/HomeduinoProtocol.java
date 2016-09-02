@@ -2,9 +2,11 @@ package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
 public abstract class HomeduinoProtocol {
@@ -146,12 +148,18 @@ public abstract class HomeduinoProtocol {
         return true;
     }
 
-    abstract public PacketType getPacketType();
-
     abstract public Result process(String pulses);
 
     public Result process(Pulses pulses) {
         return process(pulses.getPulses());
+    }
+
+    abstract protected PacketType getPacketType();
+
+    abstract protected List<RFXComValueSelector> getSupportedInputValueSelectors();
+
+    protected List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+        return Arrays.asList(RFXComValueSelector.COMMAND);
     }
 
     public static class Pulses {
@@ -219,6 +227,14 @@ public abstract class HomeduinoProtocol {
 
         public PacketType getPacketType() {
             return getProtocol().getPacketType();
+        }
+
+        public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+            return getProtocol().getSupportedOutputValueSelectors();
+        }
+
+        public List<RFXComValueSelector> getSupportedInputValueSelectors() {
+            return getProtocol().getSupportedInputValueSelectors();
         }
 
     }

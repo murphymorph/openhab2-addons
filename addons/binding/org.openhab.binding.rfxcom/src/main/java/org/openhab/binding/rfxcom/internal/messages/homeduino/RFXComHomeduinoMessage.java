@@ -51,7 +51,6 @@ public class RFXComHomeduinoMessage implements RFXComMessage {
         }
 
         throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
-
     }
 
     @Override
@@ -86,12 +85,12 @@ public class RFXComHomeduinoMessage implements RFXComMessage {
 
     @Override
     public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
-        return null;
+        return result.getSupportedInputValueSelectors();
     }
 
     @Override
     public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
-        return null;
+        return result.getSupportedOutputValueSelectors();
     }
 
     @Override

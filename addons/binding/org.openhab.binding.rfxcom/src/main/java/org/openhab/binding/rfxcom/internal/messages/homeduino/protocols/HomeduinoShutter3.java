@@ -1,5 +1,9 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
 public final class HomeduinoShutter3 extends HomeduinoProtocol {
@@ -37,4 +41,15 @@ public final class HomeduinoShutter3 extends HomeduinoProtocol {
     public PacketType getPacketType() {
         return PacketType.HOMEDUINO_SHUTTER3;
     }
+
+    @Override
+    protected List<RFXComValueSelector> getSupportedInputValueSelectors() {
+        return Arrays.asList(RFXComValueSelector.COMMAND);
+    }
+
+    @Override
+    protected List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+        return Arrays.asList(RFXComValueSelector.SHUTTER);
+    }
+
 }
