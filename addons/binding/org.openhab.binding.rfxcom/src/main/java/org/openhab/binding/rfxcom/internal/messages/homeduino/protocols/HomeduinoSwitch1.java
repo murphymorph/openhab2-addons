@@ -16,12 +16,12 @@ public final class HomeduinoSwitch1 extends HomeduinoCoCo2 {
     }
 
     @Override
-    protected PacketType getPacketType() {
+    public PacketType getPacketType() {
         return PacketType.HOMEDUINO_SWITCH1;
     }
 
     @Override
-    protected List<RFXComValueSelector> getSupportedInputValueSelectors() {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return Arrays.asList(COMMAND, CONTACT);
     }
 }

@@ -35,7 +35,6 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
 
     private RFXComEventListener homeduinoEventListener = new HomeduinoMessageListener();
 
-    private static final int timeout = 5000;
     private static HomeduinoResponseMessage responseMessage = null;
     private Object notifierObject = new Object();
     private ScheduledFuture<?> connectorTask;

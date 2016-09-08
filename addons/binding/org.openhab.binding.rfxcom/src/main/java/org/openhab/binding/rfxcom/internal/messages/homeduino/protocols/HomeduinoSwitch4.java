@@ -15,7 +15,7 @@ public final class HomeduinoSwitch4 extends HomeduinoCoCo1 {
     }
 
     @Override
-    protected List<RFXComValueSelector> getSupportedInputValueSelectors() {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return Arrays.asList(COMMAND, CONTACT);
     }
 }

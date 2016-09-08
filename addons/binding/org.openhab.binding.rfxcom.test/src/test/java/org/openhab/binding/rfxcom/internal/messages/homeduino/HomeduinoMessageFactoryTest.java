@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
-import org.eclipse.smarthome.core.library.types.StopMoveType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.junit.Assert;
@@ -51,7 +50,7 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
         RFXComMessage event = rfEvent.getInterpretations().get(0);
 
-        Assert.assertEquals("9565958.0", event.getDeviceId());
+        Assert.assertEquals("9565958.1", event.getDeviceId());
         Assert.assertEquals(new PercentType(100), event.convertToState(RFXComValueSelector.DIMMING_LEVEL));
     }
 

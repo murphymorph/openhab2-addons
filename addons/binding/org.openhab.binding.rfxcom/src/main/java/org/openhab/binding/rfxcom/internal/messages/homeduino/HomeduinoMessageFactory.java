@@ -9,45 +9,65 @@ import java.util.Map;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
+import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoDimmer1;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoPir1;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoShutter3;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoSwitch1;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoSwitch4;
 
 public class HomeduinoMessageFactory {
-
-    final static String classUrl = "org.openhab.binding.rfxcom.internal.messages.homeduino.";
-
     @SuppressWarnings("serial")
-    private static final Map<PacketType, String> messageClasses = Collections
-            .unmodifiableMap(new HashMap<PacketType, String>() {
+    private static final Map<PacketType, Class<? extends HomeduinoProtocol>> PROTOCOL_CLASSES = Collections
+            .unmodifiableMap(new HashMap<PacketType, Class<? extends HomeduinoProtocol>>() {
                 {
-                    put(PacketType.HOMEDUINO_ACK, "HomeduinoAcknowledgementMessage");
-                    put(PacketType.HOMEDUINO_ERROR, "HomeduinoErrorMessage");
-                    put(PacketType.HOMEDUINO_RF_EVENT, "HomeduinoEventMessage");
-                    put(PacketType.HOMEDUINO_READY, "HomeduinoReadyMessage");
+                    put(PacketType.HOMEDUINO_DIMMER1, HomeduinoDimmer1.class);
+                    put(PacketType.HOMEDUINO_PIR1, HomeduinoPir1.class);
+                    put(PacketType.HOMEDUINO_SHUTTER3, HomeduinoShutter3.class);
+                    put(PacketType.HOMEDUINO_SWITCH1, HomeduinoSwitch1.class);
+                    put(PacketType.HOMEDUINO_SWITCH4, HomeduinoSwitch4.class);
                 }
             });
 
     public static HomeduinoMessage createMessage(byte[] packet) throws RFXComNotImpException, RFXComException {
-        PacketType packetType = getPacketType(Arrays.copyOfRange(packet, 0, 3));
+        PacketTypeHomeduino packetTypeHomeduino = getPacketType(Arrays.copyOfRange(packet, 0, 3));
 
         try {
-            String className = messageClasses.get(packetType);
-            Class<?> cl = Class.forName(classUrl + className);
+            Class<? extends HomeduinoMessage> clazz = packetTypeHomeduino.getMessageClass();
             try {
-                Constructor<?> c = cl.getConstructor(byte[].class);
-                return (HomeduinoMessage) c.newInstance(packet);
+                Constructor<? extends HomeduinoMessage> c = clazz.getConstructor(byte[].class);
+                return c.newInstance(packet);
             } catch (NoSuchMethodException e) {
-                Constructor<?> c = cl.getConstructor();
-                return (HomeduinoMessage) c.newInstance();
+                Constructor<? extends HomeduinoMessage> c = clazz.getConstructor();
+                return c.newInstance();
             }
-        } catch (ClassNotFoundException e) {
-            throw new RFXComNotImpException("Message " + packetType + " not implemented", e);
-
         } catch (Exception e) {
             throw new RFXComException(e);
         }
     }
 
-    private static PacketType getPacketType(byte[] copyOfRange) {
+    private static PacketTypeHomeduino getPacketType(byte[] copyOfRange) {
         return HomeduinoBaseMessage.valueOfString(new String(copyOfRange));
+    }
+
+    public static PacketTypeHomeduino convertPacketType(String packetType) {
+        for (PacketTypeHomeduino p : PacketTypeHomeduino.values()) {
+            if (p.toString().equals(packetType)) {
+                return p;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown packet type " + packetType);
+    }
+
+    public static RFXComMessage createMessage(PacketType packetType) throws RFXComException {
+        try {
+            Class<? extends HomeduinoProtocol> clazz = PROTOCOL_CLASSES.get(packetType);
+            return new RFXComHomeduinoCommand(clazz.newInstance());
+        } catch (Exception e) {
+            throw new RFXComException(e);
+        }
     }
 
 }

@@ -129,6 +129,10 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
         }
     }
 
+    protected BaseRFXComBridgeHandler getBridgeHandler() {
+        return bridgeHandler;
+    }
+
     /*
      * (non-Javadoc)
      *

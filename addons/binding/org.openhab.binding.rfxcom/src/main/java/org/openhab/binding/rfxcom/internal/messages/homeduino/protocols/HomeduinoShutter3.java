@@ -43,12 +43,12 @@ public final class HomeduinoShutter3 extends HomeduinoProtocol {
     }
 
     @Override
-    protected List<RFXComValueSelector> getSupportedInputValueSelectors() {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return Arrays.asList(RFXComValueSelector.COMMAND);
     }
 
     @Override
-    protected List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return Arrays.asList(RFXComValueSelector.SHUTTER);
     }
 

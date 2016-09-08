@@ -13,6 +13,7 @@
 
         <channels>
             <channel id="command" typeId="command" />
+            <channel id="shutter" typeId="shutter" />
         </channels>
 
         <config-description>

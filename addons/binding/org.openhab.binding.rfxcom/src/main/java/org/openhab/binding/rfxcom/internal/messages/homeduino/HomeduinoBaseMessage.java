@@ -4,30 +4,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openhab.binding.rfxcom.internal.messages.PacketType;
-
-public abstract class HomeduinoBaseMessage implements HomeduinoMessage {
-    private PacketType packetType;
-
-    public HomeduinoBaseMessage(PacketType packetType) {
-        this.packetType = packetType;
-    }
-
-    public PacketType getPacketType() {
-        return packetType;
-    }
-
-    private static final Map<String, PacketType> MAP = Collections.unmodifiableMap(new HashMap<String, PacketType>() {
+abstract class HomeduinoBaseMessage implements HomeduinoMessage {
+    private static final Map<String, PacketTypeHomeduino> MAP = Collections.unmodifiableMap(new HashMap<String, PacketTypeHomeduino>() {
         {
-            put("rea", PacketType.HOMEDUINO_READY);
-            put("ACK", PacketType.HOMEDUINO_ACK);
-            put("ERR", PacketType.HOMEDUINO_ERROR);
-            put("RF ", PacketType.HOMEDUINO_RF_EVENT);
+            put("rea", PacketTypeHomeduino.HOMEDUINO_READY);
+            put("ACK", PacketTypeHomeduino.HOMEDUINO_ACK);
+            put("ERR", PacketTypeHomeduino.HOMEDUINO_ERROR);
+            put("RF ", PacketTypeHomeduino.HOMEDUINO_RF_EVENT);
         }
     });
 
-    static PacketType valueOfString(String value) {
-        PacketType p = PacketType.UNKNOWN;
+    static PacketTypeHomeduino valueOfString(String value) {
+        PacketTypeHomeduino p = PacketTypeHomeduino.UNKNOWN;
         if (MAP.containsKey(value)) {
             p = MAP.get(value);
         }

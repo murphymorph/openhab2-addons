@@ -16,10 +16,16 @@ import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
 import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol;
 
 public class RFXComHomeduinoMessage implements RFXComMessage {
-    private final HomeduinoProtocol.Result result;
+    private final HomeduinoProtocol protocol;
+    private HomeduinoProtocol.Result result;
 
-    public RFXComHomeduinoMessage(HomeduinoProtocol.Result process) {
-        this.result = process;
+    public RFXComHomeduinoMessage(HomeduinoProtocol.Result result) {
+        this.result = result;
+        this.protocol = result.getProtocol();
+    }
+
+    public RFXComHomeduinoMessage(HomeduinoProtocol protocol) {
+        this.protocol = protocol;
     }
 
     @Override

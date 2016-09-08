@@ -32,12 +32,6 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
 
     private Logger logger = LoggerFactory.getLogger(HomeduinoEventMessage.class);
 
-    private final static List<RFXComValueSelector> supportedInputValueSelectors = Arrays
-            .asList(RFXComValueSelector.COMMAND, RFXComValueSelector.CONTACT);
-
-    private final static List<RFXComValueSelector> supportedOutputValueSelectors = Arrays
-            .asList(RFXComValueSelector.COMMAND);
-
     private final static List<HomeduinoProtocol> SUPPORTED_PROTOCOLS = initializeProtocols();
 
     private static List<HomeduinoProtocol> initializeProtocols() {
@@ -51,13 +45,7 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
     }
 
     public HomeduinoEventMessage(byte[] data) {
-        super(PacketType.HOMEDUINO_RF_EVENT);
         this.data = data;
-    }
-
-    public byte[] decodeMessage() {
-        // convert
-        return null;
     }
 
     public static String decodeMessage(RFXComMessage message) {
@@ -110,21 +98,8 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         return String.format("%" + width + "s", Integer.toBinaryString(number)).replace(' ', '0');
     }
 
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
-        return supportedInputValueSelectors;
-    }
-
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
-        return supportedOutputValueSelectors;
-    }
-
     public String getDeviceId(Result result) throws RFXComException {
         return result.getId() + "." + result.getUnit();
-    }
-
-    @Override
-    public PacketType getPacketType() {
-        return PacketType.LIGHTING2;
     }
 
     public List<RFXComMessage> getInterpretations() {

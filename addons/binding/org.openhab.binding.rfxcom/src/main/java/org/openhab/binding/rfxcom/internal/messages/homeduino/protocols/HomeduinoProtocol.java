@@ -154,11 +154,11 @@ public abstract class HomeduinoProtocol {
         return process(pulses.getPulses());
     }
 
-    abstract protected PacketType getPacketType();
+    abstract public PacketType getPacketType();
 
-    abstract protected List<RFXComValueSelector> getSupportedInputValueSelectors();
+    abstract public List<RFXComValueSelector> getSupportedInputValueSelectors();
 
-    protected List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return Arrays.asList(RFXComValueSelector.COMMAND);
     }
 

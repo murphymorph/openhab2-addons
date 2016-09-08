@@ -57,6 +57,7 @@ public class RFXComHandlerFactory extends BaseThingHandlerFactory {
         return SUPPORTED_THING_TYPES.contains(thingTypeUID);
     }
 
+
     @Override
     protected ThingHandler createHandler(Thing thing) {
 

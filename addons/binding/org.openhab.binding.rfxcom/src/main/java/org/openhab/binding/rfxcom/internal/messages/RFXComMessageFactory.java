@@ -17,59 +17,6 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 
 public class RFXComMessageFactory {
-
-    final static String classUrl = "org.openhab.binding.rfxcom.internal.messages.";
-
-    @SuppressWarnings("serial")
-    private static final Map<PacketType, String> messageClasses = Collections
-            .unmodifiableMap(new HashMap<PacketType, String>() {
-                {
-                    put(PacketType.INTERFACE_CONTROL, "RFXComControlMessage");
-                    put(PacketType.INTERFACE_MESSAGE, "RFXComInterfaceMessage");
-                    put(PacketType.TRANSMITTER_MESSAGE, "RFXComTransmitterMessage");
-                    put(PacketType.UNDECODED_RF_MESSAGE, "RFXComUndecodedRFMessage");
-                    put(PacketType.LIGHTING1, "RFXComLighting1Message");
-                    put(PacketType.LIGHTING2, "RFXComLighting2Message");
-                    put(PacketType.LIGHTING3, "RFXComLighting3Message");
-                    put(PacketType.LIGHTING4, "RFXComLighting4Message");
-                    put(PacketType.LIGHTING5, "RFXComLighting5Message");
-                    put(PacketType.LIGHTING6, "RFXComLighting6Message");
-                    put(PacketType.CHIME, "RFXComChimeMessage");
-                    put(PacketType.FAN, "RFXComFanMessage");
-                    put(PacketType.CURTAIN1, "RFXComCurtain1Message");
-                    put(PacketType.BLINDS1, "RFXComBlinds1Message");
-                    put(PacketType.RFY, "RFXComRfyMessage");
-                    put(PacketType.SECURITY1, "RFXComSecurity1Message");
-                    put(PacketType.CAMERA1, "RFXComCamera1Message");
-                    put(PacketType.REMOTE_CONTROL, "RFXComRemoteControlMessage");
-                    put(PacketType.THERMOSTAT1, "RFXComThermostat1Message");
-                    put(PacketType.THERMOSTAT2, "RFXComThermostat2Message");
-                    put(PacketType.THERMOSTAT3, "RFXComThermostat3Message");
-                    put(PacketType.BBQ1, "RFXComBBQMessage");
-                    put(PacketType.TEMPERATURE_RAIN, "RFXComTemperatureRainMessage");
-                    put(PacketType.TEMPERATURE, "RFXComTemperatureMessage");
-                    put(PacketType.HUMIDITY, "RFXComHumidityMessage");
-                    put(PacketType.TEMPERATURE_HUMIDITY, "RFXComTemperatureHumidityMessage");
-                    put(PacketType.BAROMETRIC, "RFXComBarometricMessage");
-                    put(PacketType.TEMPERATURE_HUMIDITY_BAROMETRIC, "RFXComTemperatureHumidityBarometricMessage");
-                    put(PacketType.RAIN, "RFXComRainMessage");
-                    put(PacketType.WIND, "RFXComWindMessage");
-                    put(PacketType.UV, "RFXComUVMessage");
-                    put(PacketType.DATE_TIME, "RFXComDateTimeMessage");
-                    put(PacketType.CURRENT, "RFXComCurrentMessage");
-                    put(PacketType.ENERGY, "RFXComEnergyMessage");
-                    put(PacketType.CURRENT_ENERGY, "RFXComCurrentEnergyMessage");
-                    put(PacketType.POWER, "RFXComPowerMessage");
-                    put(PacketType.WEIGHT, "RFXComWeightMessage");
-                    put(PacketType.GAS, "RFXComGasMessage");
-                    put(PacketType.WATER, "RFXComWaterMessage");
-                    put(PacketType.RFXSENSOR, "RFXComRFXSensorMessage");
-                    put(PacketType.RFXMETER, "RFXComRFXMeterMessage");
-                    put(PacketType.FS20, "RFXComFS20Message");
-                    put(PacketType.IO_LINES, "RFXComIOLinesMessage");
-                }
-            });
-
     /**
      * Command to reset RFXCOM controller.
      * 
@@ -101,13 +48,9 @@ public class RFXComMessageFactory {
     public static RFXComMessage createMessage(PacketType packetType) throws RFXComException, RFXComNotImpException {
 
         try {
-            String className = messageClasses.get(packetType);
-            Class<?> cl = Class.forName(classUrl + className);
-            return (RFXComMessage) cl.newInstance();
-
-        } catch (ClassNotFoundException e) {
-            throw new RFXComNotImpException("Message " + packetType + " not implemented", e);
-
+            Class<? extends RFXComMessage> clazz = packetType.getMessageClass();
+            Constructor<? extends RFXComMessage> c = clazz.getConstructor(byte[].class);
+            return c.newInstance();
         } catch (Exception e) {
             throw new RFXComException(e);
         }
@@ -118,14 +61,9 @@ public class RFXComMessageFactory {
         PacketType packetType = getPacketType(packet[1]);
 
         try {
-            String className = messageClasses.get(packetType);
-            Class<?> cl = Class.forName(classUrl + className);
-            Constructor<?> c = cl.getConstructor(byte[].class);
-            return (RFXComMessage) c.newInstance(packet);
-
-        } catch (ClassNotFoundException e) {
-            throw new RFXComNotImpException("Message " + packetType + " not implemented", e);
-
+            Class<? extends RFXComMessage> clazz = packetType.getMessageClass();
+            Constructor<? extends RFXComMessage> c = clazz.getConstructor(byte[].class);
+            return c.newInstance(packet);
         } catch (Exception e) {
             throw new RFXComException(e);
         }
