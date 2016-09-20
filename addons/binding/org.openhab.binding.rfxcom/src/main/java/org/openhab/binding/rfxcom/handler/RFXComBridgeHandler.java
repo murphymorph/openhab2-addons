@@ -21,6 +21,7 @@ import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
 import org.openhab.binding.rfxcom.internal.connector.RFXComJD2XXConnector;
 import org.openhab.binding.rfxcom.internal.connector.RFXComSerialConnector;
+import org.openhab.binding.rfxcom.internal.connector.RFXComTcpConnector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage;
@@ -94,11 +95,16 @@ public class RFXComBridgeHandler extends BaseRFXComBridgeHandler {
                 if (connector == null) {
                     connector = new RFXComJD2XXConnector();
                 }
+            } else if (configuration.host != null) {
+                deviceName = configuration.host;
+                if (connector == null) {
+                    connector = new RFXComTcpConnector();
+                }
             }
 
             if (connector != null) {
                 connector.disconnect();
-                connector.connect(deviceName);
+                connector.connect(configuration);
 
                 logger.debug("Reset controller");
                 connector.sendMessage(RFXComMessageFactory.CMD_RESET);
@@ -190,6 +196,7 @@ public class RFXComBridgeHandler extends BaseRFXComBridgeHandler {
                     break;
 
                 case RFXComBindingConstants.BRIDGE_TYPE_MANUAL_BRIDGE:
+                case RFXComBindingConstants.BRIDGE_TYPE_TCP_BRIDGE:
                     if (conf.transceiverType != null) {
                         switch (conf.transceiverType) {
                             case RFXComBindingConstants.TRANSCEIVER_433_92MHz:

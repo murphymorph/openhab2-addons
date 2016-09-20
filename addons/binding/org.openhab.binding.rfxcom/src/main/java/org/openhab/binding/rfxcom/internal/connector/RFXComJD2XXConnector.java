@@ -18,6 +18,7 @@ import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.IOUtils;
+import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +31,9 @@ import jd2xx.JD2XXOutputStream;
  *
  * @author Pauli Anttila - Initial contribution
  */
-public class RFXComJD2XXConnector implements RFXComConnectorInterface {
+public class RFXComJD2XXConnector extends RFXComBaseConnector {
 
     private static final Logger logger = LoggerFactory.getLogger(RFXComJD2XXConnector.class);
-
-    private static List<RFXComEventListener> _listeners = new ArrayList<RFXComEventListener>();
 
     JD2XX serialPort = null;
     JD2XXInputStream in = null;
@@ -46,13 +45,13 @@ public class RFXComJD2XXConnector implements RFXComConnectorInterface {
     }
 
     @Override
-    public void connect(String device) throws IOException {
-        logger.info("Connecting to RFXCOM device '{}'.", device);
+    public void connect(RFXComBridgeConfiguration device) throws IOException {
+        logger.info("Connecting to RFXCOM device '{}' using JD2XX.", device.bridgeId);
 
         if (serialPort == null) {
             serialPort = new JD2XX();
         }
-        serialPort.openBySerialNumber(device);
+        serialPort.openBySerialNumber(device.bridgeId);
         serialPort.setBaudRate(38400);
         serialPort.setDataCharacteristics(8, JD2XX.STOP_BITS_1, JD2XX.PARITY_NONE);
         serialPort.setFlowControl(JD2XX.FLOW_NONE, 0, 0);
@@ -66,7 +65,7 @@ public class RFXComJD2XXConnector implements RFXComConnectorInterface {
             in.reset();
         }
 
-        readerThread = new SerialReader(in);
+        readerThread = new RFXComStreamReader(this, in);
         readerThread.start();
     }
 
@@ -112,6 +111,7 @@ public class RFXComJD2XXConnector implements RFXComConnectorInterface {
         out.write(data);
     }
 
+    // TODO this might have been moved somewhere????
     @Override
     public synchronized void addEventListener(RFXComEventListener rfxComEventListener) {
         if (!_listeners.contains(rfxComEventListener)) {
