@@ -136,6 +136,7 @@ public class RFXComBindingConstants {
     public final static ThingTypeUID THING_TYPE_FS20 = new ThingTypeUID(BINDING_ID, "fs20");
     public final static ThingTypeUID THING_TYPE_RFY = new ThingTypeUID(BINDING_ID, "rfy");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH1 = new ThingTypeUID(BINDING_ID, "homeduino_switch1");
+    public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH2 = new ThingTypeUID(BINDING_ID, "homeduino_switch2");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_SWITCH4 = new ThingTypeUID(BINDING_ID, "homeduino_switch4");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_DIMMER1 = new ThingTypeUID(BINDING_ID, "homeduino_dommer1");
     public static final ThingTypeUID THING_TYPE_HOMEDUINO_PIR1 = new ThingTypeUID(BINDING_ID, "homeduino_pir1");
@@ -153,9 +154,11 @@ public class RFXComBindingConstants {
             THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC, THING_TYPE_RAIN, THING_TYPE_WIND, THING_TYPE_UV,
             THING_TYPE_DATE_TIME, THING_TYPE_CURRENT, THING_TYPE_ENERGY_USAGE, THING_TYPE_CURRENT_ENERGY,
             THING_TYPE_POWER, THING_TYPE_WEIGHTING_SCALE, THING_TYPE_GAS_USAGE, THING_TYPE_WATER_USAGE,
-            THING_TYPE_RFX_SENSOR, THING_TYPE_RFX_METER, THING_TYPE_FS20, THING_TYPE_RFY,
-            THING_TYPE_HOMEDUINO_SWITCH1, THING_TYPE_HOMEDUINO_SWITCH4, THING_TYPE_HOMEDUINO_DIMMER1,
-            THING_TYPE_HOMEDUINO_PIR1, THING_TYPE_HOMEDUINO_SHUTTER3);
+            THING_TYPE_RFX_SENSOR, THING_TYPE_RFX_METER, THING_TYPE_FS20, THING_TYPE_RFY, THING_TYPE_HOMEDUINO_SWITCH1,
+			THING_TYPE_HOMEDUINO_SWITCH2, THING_TYPE_HOMEDUINO_SWITCH4, THING_TYPE_HOMEDUINO_DIMMER1, THING_TYPE_HOMEDUINO_PIR1,
+            THING_TYPE_HOMEDUINO_SHUTTER3
+			);
+
 
     /**
      * Map RFXCOM packet types to RFXCOM Thing types and vice versa.
@@ -190,8 +193,7 @@ public class RFXComBindingConstants {
             .put(PacketType.SECURITY1, RFXComBindingConstants.THING_TYPE_SECURITY1)
             .put(PacketType.TEMPERATURE, RFXComBindingConstants.THING_TYPE_TEMPERATURE)
             .put(PacketType.TEMPERATURE_HUMIDITY, RFXComBindingConstants.THING_TYPE_TEMPERATURE_HUMIDITY)
-            .put(PacketType.TEMPERATURE_HUMIDITY_BAROMETRIC,
-                    RFXComBindingConstants.THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC)
+            .put(PacketType.TEMPERATURE_HUMIDITY_BAROMETRIC, RFXComBindingConstants.THING_TYPE_TEMPERATURE_HUMIDITY_BAROMETRIC)
             .put(PacketType.TEMPERATURE_RAIN, RFXComBindingConstants.THING_TYPE_RAIN)
             .put(PacketType.THERMOSTAT1, RFXComBindingConstants.THING_TYPE_THERMOSTAT1)
             .put(PacketType.THERMOSTAT2, RFXComBindingConstants.THING_TYPE_THERMOSTAT2)
@@ -201,6 +203,7 @@ public class RFXComBindingConstants {
             .put(PacketType.WEIGHT, RFXComBindingConstants.THING_TYPE_WEIGHTING_SCALE)
             .put(PacketType.WIND, RFXComBindingConstants.THING_TYPE_WIND)
             .put(PacketType.HOMEDUINO_SWITCH1, RFXComBindingConstants.THING_TYPE_HOMEDUINO_SWITCH1)
+            .put(PacketType.HOMEDUINO_SWITCH2, RFXComBindingConstants.THING_TYPE_HOMEDUINO_SWITCH2)
             .put(PacketType.HOMEDUINO_SWITCH4, RFXComBindingConstants.THING_TYPE_HOMEDUINO_SWITCH4)
             .put(PacketType.HOMEDUINO_DIMMER1, RFXComBindingConstants.THING_TYPE_HOMEDUINO_DIMMER1)
             .put(PacketType.HOMEDUINO_PIR1, RFXComBindingConstants.THING_TYPE_HOMEDUINO_PIR1)

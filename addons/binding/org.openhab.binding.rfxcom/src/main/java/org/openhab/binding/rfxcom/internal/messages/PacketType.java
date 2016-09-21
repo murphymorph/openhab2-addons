@@ -49,6 +49,7 @@ public enum PacketType {
     IO_LINES(128, null),
 
     HOMEDUINO_SWITCH1(255, RFXComHomeduinoSwitch1Message.class),
+    HOMEDUINO_SWITCH2(255, RFXComHomeduinoSwitch2Message.class),
     HOMEDUINO_SWITCH4(255, RFXComHomeduinoSwitch4Message.class),
     HOMEDUINO_DIMMER1(255, RFXComHomeduinoDimmer1Message.class),
     HOMEDUINO_PIR1(255, RFXComHomeduinoPir1Message.class),
