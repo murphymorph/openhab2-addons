@@ -103,7 +103,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
             }
 
             connector.disconnect();
-            connector.connect(configuration.serialPort, configuration.baudrate.intValue());
+            connector.connect(configuration);
             connector.addEventListener(homeduinoEventListener);
 
             Thread.sleep(200);

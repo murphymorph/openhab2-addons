@@ -6,31 +6,25 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 import org.openhab.binding.rfxcom.internal.connector.HomeduinoConnectorInterface;
 import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
 
 public class HomeduinoConnectorMock implements HomeduinoConnectorInterface {
     private boolean connectCalled;
-    private boolean connect2Called;
 
     private List<String> receivedMessages = new ArrayList<String>();
 
     private static List<RFXComEventListener> _listeners = new ArrayList<RFXComEventListener>();
 
     @Override
-    public void connect(String device) throws Exception {
+    public void connect(RFXComBridgeConfiguration rfxComBridgeConfiguration) throws Exception {
         this.connectCalled = true;
-    }
-
-    @Override
-    public void connect(String deviceName, int baudrate) {
-        this.connect2Called = true;
     }
 
     @Override
     public void disconnect() {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -72,9 +66,4 @@ public class HomeduinoConnectorMock implements HomeduinoConnectorInterface {
     public boolean isConnectCalled() {
         return connectCalled;
     }
-
-    public boolean isConnect2Called() {
-        return connect2Called;
-    }
-
 }

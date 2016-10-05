@@ -56,7 +56,7 @@ public class HomeduinoMessageFactoryTest {
     }
 
     @Test
-    public void testHomeduinoMessageDoorbel() throws Exception {
+    public void testHomeduinoMessageDoorbell() throws Exception {
         HomeduinoMessage result = HomeduinoMessageFactory
                 .createMessage(RF_EVENT_DOORBEL.getBytes(StandardCharsets.US_ASCII));
         Assert.assertNotEquals(result, null);
@@ -65,7 +65,7 @@ public class HomeduinoMessageFactoryTest {
         HomeduinoEventMessage rfEvent = (HomeduinoEventMessage) result;
         RFXComMessage event = rfEvent.getInterpretations().get(0);
 
-        Assert.assertEquals("4.14", event.getDeviceId());
+        Assert.assertEquals("2.7", event.getDeviceId());
         Assert.assertEquals(event.convertToState(RFXComValueSelector.CONTACT), OpenClosedType.OPEN);
     }
 

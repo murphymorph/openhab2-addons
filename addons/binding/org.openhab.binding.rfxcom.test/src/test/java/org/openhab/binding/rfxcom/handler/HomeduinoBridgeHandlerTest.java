@@ -17,6 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 public class HomeduinoBridgeHandlerTest {
     private static final String RF_EVENT = "RF receive 280 2804 1364 10776 0 0 0 0 010002020000020002000200020200020000020200000200020200000200020002020002000200020002000200020002000200000200020002000200020002000203";
 
@@ -35,11 +38,10 @@ public class HomeduinoBridgeHandlerTest {
         subject.connect();
         subject.dispose();
 
-        Assert.assertThat(connector.isConnectCalled(), Is.is(false));
-        Assert.assertThat(connector.isConnect2Called(), Is.is(true));
+        assertThat(connector.isConnectCalled(), is(true));
 
         List<String> receivedMessages = connector.getReceivedMessages();
-        Assert.assertThat(receivedMessages.size(), Is.is(0));
+        assertThat(receivedMessages.size(), is(0));
     }
 
     @Test
@@ -52,12 +54,11 @@ public class HomeduinoBridgeHandlerTest {
 
         subject.dispose();
 
-        Assert.assertThat(connector.isConnectCalled(), Is.is(false));
-        Assert.assertThat(connector.isConnect2Called(), Is.is(true));
+        assertThat(connector.isConnectCalled(), is(true));
 
         List<String> receivedMessages = connector.getReceivedMessages();
-        Assert.assertThat(receivedMessages.size(), Is.is(1));
-        Assert.assertThat(receivedMessages.get(0), Is.is("RF receive 1"));
+        assertThat(receivedMessages.size(), is(1));
+        assertThat(receivedMessages.get(0), is("RF receive 1"));
     }
 
     @Test
@@ -121,6 +122,10 @@ public class HomeduinoBridgeHandlerTest {
         public void configurationUpdated(Thing thing) {
             // TODO Auto-generated method stub
 
+        }
+
+        public void channelTriggered(Thing thing, ChannelUID channelUID, String string){
+            // TODO Auto-generated method stub
         }
 
         @Override

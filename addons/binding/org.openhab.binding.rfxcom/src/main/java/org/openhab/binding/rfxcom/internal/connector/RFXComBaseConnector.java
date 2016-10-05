@@ -9,7 +9,6 @@
 package org.openhab.binding.rfxcom.internal.connector;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,50 +19,43 @@ import org.slf4j.LoggerFactory;
  *
  * @author James Hewitt-Thomas
  */
-public abstract class RFXComBaseConnector implements RFXComConnectorInterface {
-
-    private static final Logger logger = LoggerFactory.getLogger(RFXComBaseConnector.class);
-
-    private static List<RFXComEventListener> _listeners = new ArrayList<RFXComEventListener>();
-
-    public RFXComBaseConnector() {
-    }
+abstract class RFXComBaseConnector implements RFXComConnectorInterface {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RFXComBaseConnector.class);
+    private static final List<RFXComEventListener> LISTENERS = new ArrayList<>();
 
     @Override
     public synchronized void addEventListener(RFXComEventListener rfxComEventListener) {
-        if (!_listeners.contains(rfxComEventListener)) {
-            _listeners.add(rfxComEventListener);
+        if (!LISTENERS.contains(rfxComEventListener)) {
+            LISTENERS.add(rfxComEventListener);
         }
     }
 
     @Override
     public synchronized void removeEventListener(RFXComEventListener listener) {
-        _listeners.remove(listener);
+        LISTENERS.remove(listener);
     }
 
     void sendMsgToListeners(byte[] msg) {
         try {
-            Iterator<RFXComEventListener> iterator = _listeners.iterator();
 
-            while (iterator.hasNext()) {
-                iterator.next().packetReceived(msg);
+            for (RFXComEventListener listener : LISTENERS) {
+                listener.packetReceived(msg);
             }
 
         } catch (Exception e) {
-            logger.error("Event listener invoking error", e);
+            LOGGER.error("Event listener invoking error", e);
         }
     }
 
     void sendErrorToListeners(String error) {
         try {
-            Iterator<RFXComEventListener> iterator = _listeners.iterator();
 
-            while (iterator.hasNext()) {
-                iterator.next().errorOccured(error);
+            for (RFXComEventListener listener : LISTENERS) {
+                listener.errorOccured(error);
             }
 
         } catch (Exception e) {
-            logger.error("Event listener invoking error", e);
+            LOGGER.error("Event listener invoking error", e);
         }
     }
 }

@@ -14,6 +14,7 @@ import java.util.TooManyListenersException;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.IOUtils;
+import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,24 +24,18 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 
-public class HomeduinoSerialConnector implements HomeduinoConnectorInterface {
+public class HomeduinoSerialConnector extends RFXComBaseConnector implements HomeduinoConnectorInterface {
     private static final Logger LOGGER = LoggerFactory.getLogger(RFXComJD2XXConnector.class);
 
-    private static List<RFXComEventListener> _listeners = new ArrayList<>();
-
-    InputStream in = null;
-    OutputStream out = null;
-    SerialPort serialPort = null;
-    Thread readerThread = null;
+    private InputStream in;
+    private OutputStream out;
+    private SerialPort serialPort;
+    private Thread readerThread;
 
     @Override
-    public void connect(String device) throws Exception {
-        this.connect(device, 115200);
-    }
-
-    @Override
-    public void connect(String device, int baudrate) throws Exception {
-        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(device);
+    public void connect(RFXComBridgeConfiguration device) throws Exception {
+        int baudrate = device.baudrate.intValue();
+        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(device.serialPort);
 
         CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
 
@@ -106,17 +101,8 @@ public class HomeduinoSerialConnector implements HomeduinoConnectorInterface {
         out.flush();
     }
 
-    @Override
-    public synchronized void addEventListener(RFXComEventListener rfxComEventListener) {
-        if (!_listeners.contains(rfxComEventListener)) {
-            _listeners.add(rfxComEventListener);
-        }
-    }
 
-    @Override
-    public synchronized void removeEventListener(RFXComEventListener listener) {
-        _listeners.remove(listener);
-    }
+    // extract this similar to RFXComStreamReader
 
     public class SerialReader extends Thread implements SerialPortEventListener {
         boolean interrupted = false;
@@ -160,7 +146,7 @@ public class HomeduinoSerialConnector implements HomeduinoConnectorInterface {
                 byte[] tmpData = new byte[20];
                 int len = -1;
 
-                while ((len = in.read(tmpData)) > 0 && interrupted != true) {
+                while ((len = in.read(tmpData)) > 0 && !interrupted) {
 
                     byte[] logData = Arrays.copyOf(tmpData, len);
                     LOGGER.debug("Received data (len={}): {}", len, DatatypeConverter.printHexBinary(logData));
@@ -172,7 +158,7 @@ public class HomeduinoSerialConnector implements HomeduinoConnectorInterface {
                             start_found = false;
                         }
 
-                        if (start_found == false && ((tmpData[i] >= 97 && tmpData[i] <= 122) // a-z
+                        if (!start_found && ((tmpData[i] >= 97 && tmpData[i] <= 122) // a-z
                                 || (tmpData[i] >= 65 && tmpData[i] <= 90) // A-Z
                         )) {
 
@@ -189,9 +175,7 @@ public class HomeduinoSerialConnector implements HomeduinoConnectorInterface {
                                 // whole message received, send an event
                                 byte[] msg = new byte[index];
 
-                                for (int j = 0; j < index; j++) {
-                                    msg[j] = dataBuffer[j];
-                                }
+                                System.arraycopy(dataBuffer, 0, msg, 0, index);
 
                                 sendMsgToListeners(msg);
 
@@ -226,32 +210,6 @@ public class HomeduinoSerialConnector implements HomeduinoConnectorInterface {
                 sleep(Long.MAX_VALUE);
             } catch (InterruptedException e) {
             }
-        }
-    }
-
-    private void sendMsgToListeners(byte[] msg) {
-        try {
-            Iterator<RFXComEventListener> iterator = _listeners.iterator();
-
-            while (iterator.hasNext()) {
-                iterator.next().packetReceived(msg);
-            }
-
-        } catch (Exception e) {
-            LOGGER.error("Event listener invoking error", e);
-        }
-    }
-
-    private void sendErrorToListeners(String error) {
-        try {
-            Iterator<RFXComEventListener> iterator = _listeners.iterator();
-
-            while (iterator.hasNext()) {
-                iterator.next().errorOccured(error);
-            }
-
-        } catch (Exception e) {
-            LOGGER.error("Event listener invoking error", e);
         }
     }
 }

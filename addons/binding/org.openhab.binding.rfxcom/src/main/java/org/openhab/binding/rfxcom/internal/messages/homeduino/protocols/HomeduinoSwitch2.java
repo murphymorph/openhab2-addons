@@ -54,7 +54,7 @@ public final class HomeduinoSwitch2 extends HomeduinoProtocol  {
     }
 
     @Override
-    protected List<RFXComValueSelector> getSupportedInputValueSelectors() {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return Arrays.asList(COMMAND, CONTACT);
     }
 }
