@@ -1,10 +1,10 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
-public abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
+abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
     private static int[] PULSE_LENGTHS = { 358, 1095, 11244 };
     private static int PULSE_COUNT = 50;
 
-    public HomeduinoCoCo1() {
+    HomeduinoCoCo1() {
         super(PULSE_COUNT, PULSE_LENGTHS);
     }
 
@@ -24,9 +24,9 @@ public abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
             output.append(c);
         }
 
-        int unit = Integer.parseInt(output.substring(0, 5).toString(), 2);
-        int id = Integer.parseInt(output.substring(5, 10).toString(), 2);
-        int state = 1 - Integer.parseInt(output.substring(11).toString(), 2);
+        int unit = Integer.parseInt(output.substring(0, 5), 2);
+        int id = Integer.parseInt(output.substring(5, 10), 2);
+        int state = 1 - Integer.parseInt(output.substring(11), 2);
 
         return new Result(id, unit, state, false, null);
     }

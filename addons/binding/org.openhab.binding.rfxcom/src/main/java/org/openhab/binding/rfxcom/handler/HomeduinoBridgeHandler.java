@@ -1,12 +1,5 @@
 package org.openhab.binding.rfxcom.handler;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import javax.xml.bind.DatatypeConverter;
-
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
@@ -18,25 +11,27 @@ import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoEventMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoMessageFactory;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoReadyMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoResponseMessage;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeduinoBridgeHandler.class);
+    private static final int TIMEOUT = 5000;
 
-    private Logger logger = LoggerFactory.getLogger(HomeduinoBridgeHandler.class);
+    private HomeduinoConnectorInterface connector;
+    private RFXComBridgeConfiguration configuration;
 
-    HomeduinoConnectorInterface connector = null;
-    RFXComBridgeConfiguration configuration = null;
+    private final RFXComEventListener homeduinoEventListener = new HomeduinoMessageListener();
+    private final Object notifierObject = new Object();
 
-    private RFXComEventListener homeduinoEventListener = new HomeduinoMessageListener();
-
-    private static HomeduinoResponseMessage responseMessage = null;
-    private Object notifierObject = new Object();
+    private static HomeduinoResponseMessage responseMessage;
     private ScheduledFuture<?> connectorTask;
 
     public HomeduinoBridgeHandler(Bridge bridge) {
@@ -45,7 +40,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
 
     @Override
     public void initialize() {
-        logger.debug("Initializing Homeduino bridge handler");
+        LOGGER.debug("Initializing Homeduino bridge handler");
         updateStatus(ThingStatus.OFFLINE);
 
         configuration = getConfigAs(RFXComBridgeConfiguration.class);
@@ -55,7 +50,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
 
                 @Override
                 public void run() {
-                    logger.debug("Checking Homeduino transceiver connection, thing status = {}", thing.getStatus());
+                    LOGGER.debug("Checking Homeduino transceiver connection, thing status = {}", thing.getStatus());
                     if (thing.getStatus() != ThingStatus.ONLINE) {
                         connect();
                     }
@@ -66,7 +61,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
 
     @Override
     public void dispose() {
-        logger.debug("Handler disposed.");
+        LOGGER.debug("Handler disposed.");
 
         if (connector != null) {
             connector.removeEventListener(homeduinoEventListener);
@@ -95,7 +90,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
             return;
         }
 
-        logger.debug("Connecting to Homeduino transceiver");
+        LOGGER.debug("Connecting to Homeduino transceiver");
 
         try {
             if (connector == null) {
@@ -113,9 +108,9 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
         } catch (Exception e) {
             e.printStackTrace();
 
-            logger.error("Connection to RFXCOM transceiver failed: {}", e.getMessage());
+            LOGGER.error("Connection to RFXCOM transceiver failed: {}", e.getMessage());
         } catch (UnsatisfiedLinkError e) {
-            logger.error("Error occured when trying to load native library for OS '{}' version '{}', processor '{}'",
+            LOGGER.error("Error occured when trying to load native library for OS '{}' version '{}', processor '{}'",
                     System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"), e);
         }
     }
@@ -126,7 +121,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
         public void packetReceived(byte[] packet) {
             try {
                 HomeduinoMessage message = HomeduinoMessageFactory.createMessage(packet);
-                logger.debug("Message received: {}", message);
+                LOGGER.debug("Message received: {}", message);
 
                 if (message instanceof HomeduinoReadyMessage) {
                     if (configuration.receiverPin != null) {
@@ -136,7 +131,7 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
                 } else if (message instanceof HomeduinoResponseMessage) {
                     HomeduinoResponseMessage resp = (HomeduinoResponseMessage) message;
 
-                    logger.debug("Response received: {}", message.toString());
+                    LOGGER.debug("Response received: {}", message.toString());
                     setResponseMessage(resp);
                     synchronized (notifierObject) {
                         notifierObject.notify();
@@ -151,7 +146,8 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
                             try {
                                 deviceStatusListener.onDeviceMessageReceived(getThing().getUID(), interprentedMsg);
                             } catch (Exception e) {
-                                logger.error("An exception occurred while calling the DeviceStatusListener", e);
+                                e.printStackTrace();
+                                LOGGER.error("An exception occurred while calling the DeviceStatusListener", e);
                             }
                         }
                     }
@@ -159,12 +155,12 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
                     // todo handle this situation
                 }
             } catch (RFXComNotImpException e) {
-                logger.debug("Message not supported, data: {}", DatatypeConverter.printHexBinary(packet));
+                LOGGER.debug("Message not supported, data: {}", DatatypeConverter.printHexBinary(packet));
             } catch (RFXComException e) {
-                logger.error("Error occured during packet receiving, data: {}",
+                LOGGER.error("Error occured during packet receiving, data: {}",
                         DatatypeConverter.printHexBinary(packet), e.getMessage());
             } catch (IOException e) {
-                logger.error("Error occured during packet processing", e.getMessage());
+                LOGGER.error("Error occured during packet processing", e.getMessage());
             }
 
             updateStatus(ThingStatus.ONLINE);
@@ -172,17 +168,54 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
 
         @Override
         public void errorOccured(String error) {
-            logger.error("Error occured: {}", error);
+            LOGGER.error("Error occured: {}", error);
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
         }
     }
 
     @Override
     public void sendMessage(RFXComMessage msg) throws RFXComException {
+        setResponseMessage(null);
+
         try {
             connector.sendMessage(HomeduinoEventMessage.decodeMessage(msg));
         } catch (IOException e) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
             throw new RFXComException("Error while sending message", e);
         }
+        try {
+            HomeduinoResponseMessage resp;
+            synchronized (notifierObject) {
+                notifierObject.wait(TIMEOUT);
+                resp = getResponseMessage();
+            }
+
+            if (resp != null) {
+                switch (resp.getPacketType()) {
+                    case HOMEDUINO_ACK:
+                        LOGGER.debug("Command successfully transmitted, 'ACK' received");
+                        break;
+
+                    case HOMEDUINO_ERROR:
+                        LOGGER.error("Command transmit failed, 'ERR' received");
+                        break;
+                }
+            } else {
+                LOGGER.warn("No response received from transceiver");
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+            }
+
+        } catch (InterruptedException ie) {
+            LOGGER.error("No acknowledge received from Homeduino controller, TIMEOUT {}ms ", TIMEOUT);
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+        }
+    }
+
+    public void setConnector(HomeduinoConnectorInterface connector) {
+        this.connector = connector;
+    }
+
+    public void setConfiguration(RFXComBridgeConfiguration configuration) {
+        this.configuration = configuration;
     }
 }

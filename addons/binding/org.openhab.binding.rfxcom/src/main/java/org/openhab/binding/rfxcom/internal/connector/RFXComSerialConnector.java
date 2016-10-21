@@ -8,26 +8,17 @@
  */
 package org.openhab.binding.rfxcom.internal.connector;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.TooManyListenersException;
-
-import javax.xml.bind.DatatypeConverter;
-
+import gnu.io.*;
 import org.apache.commons.io.IOUtils;
 import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-import gnu.io.UnsupportedCommOperationException;
+import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.TooManyListenersException;
 
 /**
  * RFXCOM connector for serial port communication.
@@ -35,13 +26,12 @@ import gnu.io.UnsupportedCommOperationException;
  * @author Pauli Anttila - Initial contribution
  */
 public class RFXComSerialConnector extends RFXComBaseConnector implements SerialPortEventListener {
-
     private static final Logger logger = LoggerFactory.getLogger(RFXComSerialConnector.class);
 
-    InputStream in = null;
-    OutputStream out = null;
-    SerialPort serialPort = null;
-    Thread readerThread = null;
+    protected InputStream in;
+    protected OutputStream out;
+    protected SerialPort serialPort;
+    protected Thread readerThread;
 
     public RFXComSerialConnector() {
     }
@@ -72,7 +62,7 @@ public class RFXComSerialConnector extends RFXComBaseConnector implements Serial
             serialPort.addEventListener(this);
             serialPort.notifyOnDataAvailable(true);
             logger.debug("Serial port event listener started");
-        } catch (TooManyListenersException e) {
+        } catch (TooManyListenersException ignore) {
         }
 
         readerThread = new RFXComStreamReader(this, in);

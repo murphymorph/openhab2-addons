@@ -1,13 +1,13 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
+import org.openhab.binding.rfxcom.RFXComValueSelector;
+import org.openhab.binding.rfxcom.internal.messages.PacketType;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.openhab.binding.rfxcom.RFXComValueSelector;
-import org.openhab.binding.rfxcom.internal.messages.PacketType;
 
 public abstract class HomeduinoProtocol {
     private int pulseCount;
@@ -151,7 +151,7 @@ public abstract class HomeduinoProtocol {
     abstract public Result process(String pulses);
 
     public Result process(Pulses pulses) {
-        return process(pulses.getPulses());
+        return process(pulses.pulses);
     }
 
     abstract public PacketType getPacketType();
@@ -173,16 +173,8 @@ public abstract class HomeduinoProtocol {
             this.pulseCount = pulses.length();
         }
 
-        public int[] getPulseLengths() {
-            return pulseLengths;
-        }
-
-        public String getPulses() {
+        String getPulses() {
             return pulses;
-        }
-
-        public int getPulseCount() {
-            return pulseCount;
         }
     }
 

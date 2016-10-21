@@ -1,10 +1,11 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
+
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 public final class HomeduinoShutter3 extends HomeduinoProtocol {
     private static final int PULSE_COUNT = 82;
@@ -44,12 +45,12 @@ public final class HomeduinoShutter3 extends HomeduinoProtocol {
 
     @Override
     public List<RFXComValueSelector> getSupportedInputValueSelectors() {
-        return Arrays.asList(RFXComValueSelector.COMMAND);
+        return singletonList(RFXComValueSelector.COMMAND);
     }
 
     @Override
     public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
-        return Arrays.asList(RFXComValueSelector.SHUTTER);
+        return singletonList(RFXComValueSelector.SHUTTER);
     }
 
 }

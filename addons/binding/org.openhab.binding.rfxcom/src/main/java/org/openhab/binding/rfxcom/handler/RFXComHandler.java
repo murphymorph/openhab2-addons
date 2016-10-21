@@ -8,19 +8,9 @@
  */
 package org.openhab.binding.rfxcom.handler;
 
-import static org.openhab.binding.rfxcom.RFXComBindingConstants.*;
-
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.thing.ChannelUID;
-import org.eclipse.smarthome.core.thing.Thing;
-import org.eclipse.smarthome.core.thing.ThingStatus;
-import org.eclipse.smarthome.core.thing.ThingStatusDetail;
-import org.eclipse.smarthome.core.thing.ThingStatusInfo;
-import org.eclipse.smarthome.core.thing.ThingUID;
+import org.eclipse.smarthome.core.thing.*;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
@@ -36,6 +26,10 @@ import org.openhab.binding.rfxcom.internal.messages.RFXComMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
+import static org.openhab.binding.rfxcom.RFXComBindingConstants.*;
+
 /**
  * The {@link RFXComHandler} is responsible for handling commands, which are
  * sent to one of the channels.
@@ -43,14 +37,11 @@ import org.slf4j.LoggerFactory;
  * @author Pauli Anttila - Initial contribution
  */
 public class RFXComHandler extends BaseThingHandler implements DeviceMessageListener {
+    private static final int LOW_BATTERY_LEVEL = 1;
 
     private Logger logger = LoggerFactory.getLogger(RFXComHandler.class);
 
-    private final int LOW_BATTERY_LEVEL = 1;
-
-    ScheduledFuture<?> refreshJob;
     private BaseRFXComBridgeHandler bridgeHandler;
-
     private RFXComDeviceConfiguration config;
 
     public RFXComHandler(Thing thing) {

@@ -3,13 +3,13 @@ package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
+abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
     private Logger logger = LoggerFactory.getLogger(HomeduinoCoCo2.class);
 
     private static int[] PULSE_LENGTHS = { 260, 1300, 2700, 10400 };
     private int pulseCount;
 
-    public HomeduinoCoCo2(int pulseCount) {
+    HomeduinoCoCo2(int pulseCount) {
         super(pulseCount, PULSE_LENGTHS);
         this.pulseCount = pulseCount;
     }
@@ -34,7 +34,7 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
             output.append(c);
         }
 
-        int id = Integer.parseInt(output.substring(0, 26).toString(), 2);
+        int id = Integer.parseInt(output.substring(0, 26), 2);
         boolean all = Character.getNumericValue(output.charAt(26)) == 1;
         char stateChar = output.charAt(27);
         Integer state = null;
@@ -45,12 +45,12 @@ public abstract class HomeduinoCoCo2 extends HomeduinoProtocol {
         if (all) {
             unit = 0;
         } else {
-            unit = Integer.parseInt(output.substring(28, 32).toString(), 2) + 1;
+            unit = Integer.parseInt(output.substring(28, 32), 2) + 1;
         }
 
         Integer dimlevel = null;
         if (pulseCount > 132) {
-            dimlevel = Integer.parseInt(output.substring(32).toString(), 2);
+            dimlevel = Integer.parseInt(output.substring(32), 2);
         }
 
         logger.warn("all: " + all);

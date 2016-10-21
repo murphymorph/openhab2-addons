@@ -1,7 +1,5 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino;
 
-import java.util.List;
-
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.UpDownType;
@@ -15,17 +13,13 @@ import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
 import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol;
 
-public class RFXComHomeduinoMessage implements RFXComMessage {
-    private final HomeduinoProtocol protocol;
+import java.util.List;
+
+abstract class RFXComHomeduinoMessage implements RFXComMessage {
     private HomeduinoProtocol.Result result;
 
-    public RFXComHomeduinoMessage(HomeduinoProtocol.Result result) {
+    RFXComHomeduinoMessage(HomeduinoProtocol.Result result) {
         this.result = result;
-        this.protocol = result.getProtocol();
-    }
-
-    public RFXComHomeduinoMessage(HomeduinoProtocol protocol) {
-        this.protocol = protocol;
     }
 
     @Override

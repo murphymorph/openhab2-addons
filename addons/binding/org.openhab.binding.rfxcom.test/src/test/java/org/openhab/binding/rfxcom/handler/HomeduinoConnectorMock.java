@@ -1,18 +1,19 @@
 package org.openhab.binding.rfxcom.handler;
 
+import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
+import org.openhab.binding.rfxcom.internal.connector.HomeduinoConnectorInterface;
+import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
-import org.openhab.binding.rfxcom.internal.connector.HomeduinoConnectorInterface;
-import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
-
 public class HomeduinoConnectorMock implements HomeduinoConnectorInterface {
     private boolean connectCalled;
 
+    private List<String> sentMessages = new ArrayList<String>();
     private List<String> receivedMessages = new ArrayList<String>();
 
     private static List<RFXComEventListener> _listeners = new ArrayList<RFXComEventListener>();
@@ -29,12 +30,16 @@ public class HomeduinoConnectorMock implements HomeduinoConnectorInterface {
 
     @Override
     public void sendMessage(String message) {
-        receivedMessages.add(message);
+        sentMessages.add(message);
     }
 
     @Override
     public void sendMessage(byte[] data) throws IOException {
         throw new UnsupportedOperationException("not supported");
+    }
+
+    public List<String> getSentMessages() {
+        return sentMessages;
     }
 
     public List<String> getReceivedMessages() {
@@ -61,6 +66,14 @@ public class HomeduinoConnectorMock implements HomeduinoConnectorInterface {
     @Override
     public synchronized void removeEventListener(RFXComEventListener listener) {
         _listeners.remove(listener);
+    }
+
+    void sendMsgToListeners(byte[] msg) {
+
+    }
+
+    void sendErrorToListeners(String error) {
+
     }
 
     public boolean isConnectCalled() {

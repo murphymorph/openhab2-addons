@@ -6,11 +6,11 @@ public enum PacketType {
     INTERFACE_CONTROL(0, RFXComControlMessage.class),
     INTERFACE_MESSAGE(1, RFXComInterfaceMessage.class),
     TRANSMITTER_MESSAGE(2, RFXComTransmitterMessage.class),
-    UNDECODED_RF_MESSAGE(3, null), // class does not seem to exist
+    UNDECODED_RF_MESSAGE(3, null),
 
     LIGHTING1(16, RFXComLighting1Message.class),
     LIGHTING2(17, RFXComLighting2Message.class),
-    LIGHTING3(18, null), // class does not seem to exist
+    LIGHTING3(18, null),
     LIGHTING4(19, RFXComLighting4Message.class),
     LIGHTING5(20, RFXComLighting5Message.class),
     LIGHTING6(21, RFXComLighting6Message.class),
@@ -47,6 +47,9 @@ public enum PacketType {
     RFXMETER(113, null),
     FS20(114, null),
     IO_LINES(128, null),
+
+    HOMEDUINO_ACK(255, null), // TODO map this properly
+    HOMEDUINO_ERROR(255, null), // TODO map this properly
 
     HOMEDUINO_SWITCH1(255, RFXComHomeduinoSwitch1Message.class),
     HOMEDUINO_SWITCH2(255, RFXComHomeduinoSwitch2Message.class),

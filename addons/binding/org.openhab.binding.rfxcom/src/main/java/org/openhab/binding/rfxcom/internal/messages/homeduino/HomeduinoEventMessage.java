@@ -1,32 +1,21 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.OpenClosedType;
-import org.eclipse.smarthome.core.library.types.StopMoveType;
-import org.eclipse.smarthome.core.library.types.UpDownType;
-import org.eclipse.smarthome.core.types.Command;
-import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoDimmer1;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoPir1;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.*;
 import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol.Result;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoShutter3;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoSwitch1;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoSwitch2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HomeduinoEventMessage extends HomeduinoBaseMessage {
     private final byte[] data;
@@ -103,7 +92,7 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         return result.getId() + "." + result.getUnit();
     }
 
-    public List<RFXComMessage> getInterpretations() {
+    public List<RFXComMessage> getInterpretations() throws RFXComNotImpException, RFXComException {
         List<RFXComMessage> list = new ArrayList<>();
 
         // the result is a compressed set of timings (from rfcontrol https://github.com/pimatic/RFControl)
@@ -115,14 +104,13 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         Pattern p = Pattern.compile(".*? (([0-9]+ ){8})(([0-7][0-7])+)$");
         Matcher m = p.matcher(value);
 
-        System.out.println(value);
 
         if (m.matches()) {
             HomeduinoProtocol.Pulses pulses = HomeduinoProtocol.prepareAndFixCompressedPulses(data);
 
             for (HomeduinoProtocol protocol : SUPPORTED_PROTOCOLS) {
                 if (protocol.matches(pulses)) {
-                    list.add(new RFXComHomeduinoMessage(protocol.process(pulses)));
+                    list.add(RFXComHomeduinoMessageFactory.createMessage(protocol.process(pulses)));
                 }
             }
         } else {
@@ -130,5 +118,10 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         }
 
         return list;
+    }
+
+    @Override
+    public PacketType getPacketType() throws RFXComException {
+        return null;
     }
 }
