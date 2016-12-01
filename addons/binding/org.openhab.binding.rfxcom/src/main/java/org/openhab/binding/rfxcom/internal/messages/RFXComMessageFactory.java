@@ -19,28 +19,28 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 public class RFXComMessageFactory {
     /**
      * Command to reset RFXCOM controller.
-     * 
+     *
      */
     public final static byte[] CMD_RESET = new byte[] { 0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00 };
 
     /**
      * Command to get RFXCOM controller status.
-     * 
+     *
      */
     public final static byte[] CMD_GET_STATUS = new byte[] { 0x0D, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00 };
 
     /**
      * Command to save RFXCOM controller configuration.
-     * 
+     *
      */
     public final static byte[] CMD_SAVE = new byte[] { 0x0D, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00 };
 
     /**
      * Command to start RFXCOM receiver.
-     * 
+     *
      */
     public final static byte[] CMD_START_RECEIVER = new byte[] { 0x0D, 0x00, 0x00, 0x03, 0x07, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -72,7 +72,7 @@ public class RFXComMessageFactory {
     public static PacketType convertPacketType(String packetType) throws IllegalArgumentException {
 
         for (PacketType p : PacketType.values()) {
-            if (p.toString().equals(packetType)) {
+            if (p.toString().replace("_", "").equals(packetType.replace("_", ""))) {
                 return p;
             }
         }

@@ -14,6 +14,7 @@ import org.eclipse.smarthome.core.thing.*;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.DeviceMessageListener;
@@ -54,31 +55,39 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
 
         if (bridgeHandler != null) {
 
-            try {
-                PacketType packetType = RFXComMessageFactory
-                        .convertPacketType(channelUID.getThingUID().getThingTypeId().toUpperCase());
+            if (command instanceof RefreshType) {
+                // Not supported
 
-                RFXComMessage msg = RFXComMessageFactory.createMessage(packetType);
+            } else {
 
-                List<RFXComValueSelector> supportedValueSelectors = msg.getSupportedOutputValueSelectors();
+                try {
 
-                RFXComValueSelector valSelector = RFXComValueSelector.getValueSelector(channelUID.getId());
+                    PacketType packetType = RFXComMessageFactory
+                            .convertPacketType(channelUID.getThingUID().getThingTypeId().toUpperCase());
 
-                if (supportedValueSelectors.contains(valSelector)) {
-                    msg.setSubType(msg.convertSubType(config.subType));
-                    msg.setDeviceId(config.deviceId);
-                    msg.convertFromState(valSelector, command);
+                    RFXComMessage msg = RFXComMessageFactory.createMessage(packetType);
 
-                    bridgeHandler.sendMessage(msg);
-                } else {
-                    logger.warn("RFXCOM doesn't support transmitting for channel '{}'", channelUID.getId());
+                    List<RFXComValueSelector> supportedValueSelectors = msg.getSupportedOutputValueSelectors();
+
+                    RFXComValueSelector valSelector = RFXComValueSelector.getValueSelector(channelUID.getId());
+
+                    if (supportedValueSelectors.contains(valSelector)) {
+                        msg.setSubType(msg.convertSubType(config.subType));
+                        msg.setDeviceId(config.deviceId);
+                        msg.convertFromState(valSelector, command);
+
+                        bridgeHandler.sendMessage(msg);
+                    } else {
+                        logger.warn("RFXCOM doesn't support transmitting for channel '{}'", channelUID.getId());
+                    }
+
+                } catch (RFXComNotImpException e) {
+                    logger.error("Message not supported: {}", e.getMessage());
+                } catch (RFXComException e) {
+                    logger.error("Transmitting error: {}", e.getMessage());
                 }
-
-            } catch (RFXComNotImpException e) {
-                logger.error("Message not supported", e.getMessage());
-            } catch (RFXComException e) {
-                logger.error("Transmitting error", e.getMessage());
             }
+
         }
     }
 
@@ -251,8 +260,7 @@ public class RFXComHandler extends BaseThingHandler implements DeviceMessageList
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Error occured during message receiving: ", e.getMessage());
+            logger.error("Error occured during message receiving: {}", e.getMessage());
         }
     }
 
