@@ -1,7 +1,25 @@
 package org.openhab.binding.rfxcom.handler;
 
+import static org.eclipse.smarthome.core.library.types.OnOffType.OFF;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.openhab.binding.rfxcom.RFXComValueSelector.COMMAND;
+import static org.openhab.binding.rfxcom.internal.messages.PacketType.HOMEDUINO_SWITCH1;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.smarthome.config.core.Configuration;
-import org.eclipse.smarthome.core.thing.*;
+import org.eclipse.smarthome.core.thing.Bridge;
+import org.eclipse.smarthome.core.thing.Channel;
+import org.eclipse.smarthome.core.thing.ChannelUID;
+import org.eclipse.smarthome.core.thing.Thing;
+import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusInfo;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.thing.ThingUID;
+import org.eclipse.smarthome.core.thing.binding.BridgeHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerCallback;
 import org.eclipse.smarthome.core.types.Command;
@@ -10,16 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
-import static org.eclipse.smarthome.core.library.types.OnOffType.OFF;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.openhab.binding.rfxcom.RFXComValueSelector.COMMAND;
-import static org.openhab.binding.rfxcom.internal.messages.PacketType.HOMEDUINO_SWITCH1;
 
 public class HomeduinoBridgeHandlerTest {
     private static final String RF_EVENT = "RF receive 280 2804 1364 10776 0 0 0 0 010002020000020002000200020200020000020200000200020200000200020002020002000200020002000200020002000200000200020002000200020002000203";
@@ -125,6 +133,7 @@ public class HomeduinoBridgeHandlerTest {
 
         }
 
+        @Override
         public void channelTriggered(Thing thing, ChannelUID channelUID, String string) {
 
         }
@@ -183,7 +192,7 @@ public class HomeduinoBridgeHandlerTest {
         }
 
         @Override
-        public ThingHandler getHandler() {
+        public BridgeHandler getHandler() {
             return null;
         }
 
