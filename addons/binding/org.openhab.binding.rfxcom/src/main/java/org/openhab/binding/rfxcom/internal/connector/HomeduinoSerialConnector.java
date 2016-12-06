@@ -1,13 +1,25 @@
 package org.openhab.binding.rfxcom.internal.connector;
 
-import gnu.io.*;
-import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.TooManyListenersException;
 
-public class HomeduinoSerialConnector extends RFXComSerialConnector implements HomeduinoConnectorInterface, SerialPortEventListener {
+import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEventListener;
+import gnu.io.UnsupportedCommOperationException;
+
+public class HomeduinoSerialConnector extends RFXComSerialConnector
+        implements HomeduinoConnectorInterface, SerialPortEventListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HomeduinoSerialConnector.class);
+
     @Override
     public void connect(RFXComBridgeConfiguration device)
             throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
@@ -45,6 +57,7 @@ public class HomeduinoSerialConnector extends RFXComSerialConnector implements H
 
     @Override
     public void sendMessage(String message) throws IOException {
+        LOGGER.debug("Sending message: {}", message);
         sendMessage((message + "\r\n").getBytes(StandardCharsets.US_ASCII));
     }
 }

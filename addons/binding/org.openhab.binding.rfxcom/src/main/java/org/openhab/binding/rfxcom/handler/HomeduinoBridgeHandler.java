@@ -1,5 +1,12 @@
 package org.openhab.binding.rfxcom.handler;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.DatatypeConverter;
+
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
@@ -11,15 +18,14 @@ import org.openhab.binding.rfxcom.internal.connector.RFXComEventListener;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.*;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoEventMessage;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoMessage;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoMessageFactory;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoReadyMessage;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoResponseMessage;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.RFXComHomeduinoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(HomeduinoBridgeHandler.class);
@@ -174,11 +180,16 @@ public class HomeduinoBridgeHandler extends BaseRFXComBridgeHandler {
     }
 
     @Override
-    public void sendMessage(RFXComMessage msg) throws RFXComException {
+    public void sendMessage(RFXComMessage inputMessage) throws RFXComException {
+        if (!(inputMessage instanceof RFXComHomeduinoMessage)) {
+            throw new IllegalArgumentException("Homeduino bridge can only send Homeduino messages");
+        }
+        RFXComHomeduinoMessage msg = (RFXComHomeduinoMessage) inputMessage;
+
         setResponseMessage(null);
 
         try {
-            connector.sendMessage(HomeduinoEventMessage.decodeMessage(msg));
+            connector.sendMessage(msg.decodeToHomeduinoMessage(configuration.transmitterPin.intValue()));
         } catch (IOException e) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
             throw new RFXComException("Error while sending message", e);

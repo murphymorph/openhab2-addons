@@ -1,4 +1,6 @@
-package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
+package org.openhab.binding.rfxcom.internal.messages.homeduino;
+
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoProtocol.Result;
 
 abstract class HomeduinoCoCo1 extends HomeduinoProtocol {
     private static int[] PULSE_LENGTHS = { 358, 1095, 11244 };

@@ -8,15 +8,17 @@ import org.eclipse.smarthome.core.types.Type;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
-import org.openhab.binding.rfxcom.internal.messages.PacketType;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol;
 
-import java.util.List;
-
-abstract class RFXComHomeduinoMessage implements RFXComMessage {
+abstract public class RFXComHomeduinoMessage implements RFXComMessage {
     private HomeduinoProtocol.Result result;
+    Command command;
+
+    RFXComHomeduinoMessage() {
+        // deliberately empty
+        this.command = new Command();
+    }
 
     RFXComHomeduinoMessage(HomeduinoProtocol.Result result) {
         this.result = result;
@@ -31,6 +33,12 @@ abstract class RFXComHomeduinoMessage implements RFXComMessage {
     public byte[] decodeMessage() {
         throw new UnsupportedOperationException();
     }
+
+    public String decodeToHomeduinoMessage(int transmitterPin) {
+        return getProtocol().decode(command, transmitterPin);
+    }
+
+    abstract HomeduinoProtocol getProtocol();
 
     @Override
     public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
@@ -55,7 +63,11 @@ abstract class RFXComHomeduinoMessage implements RFXComMessage {
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
+        if (!getSupportedOutputValueSelectors().contains(valueSelector)) {
+            throw new RFXComException("Can't convert " + type + " to " + valueSelector);
+        }
 
+        command.convertFromState(valueSelector, type);
     }
 
     @Override
@@ -65,7 +77,7 @@ abstract class RFXComHomeduinoMessage implements RFXComMessage {
 
     @Override
     public void setSubType(Object subType) throws RFXComException {
-        throw new UnsupportedOperationException();
+        command.setSubType(subType);
     }
 
     @Override
@@ -75,22 +87,7 @@ abstract class RFXComHomeduinoMessage implements RFXComMessage {
 
     @Override
     public void setDeviceId(String deviceId) throws RFXComException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PacketType getPacketType() throws RFXComException {
-        return result.getPacketType();
-    }
-
-    @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
-        return result.getSupportedInputValueSelectors();
-    }
-
-    @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
-        return result.getSupportedOutputValueSelectors();
+        command.setDeviceId(deviceId);
     }
 
     @Override

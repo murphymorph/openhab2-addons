@@ -9,9 +9,6 @@
 package org.openhab.binding.rfxcom.internal.messages;
 
 import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
@@ -49,7 +46,7 @@ public class RFXComMessageFactory {
 
         try {
             Class<? extends RFXComMessage> clazz = packetType.getMessageClass();
-            Constructor<? extends RFXComMessage> c = clazz.getConstructor(byte[].class);
+            Constructor<? extends RFXComMessage> c = clazz.getConstructor();
             return c.newInstance();
         } catch (Exception e) {
             throw new RFXComException(e);

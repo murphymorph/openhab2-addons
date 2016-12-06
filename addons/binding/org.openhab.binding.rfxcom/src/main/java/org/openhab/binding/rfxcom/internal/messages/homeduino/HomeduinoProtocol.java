@@ -1,11 +1,7 @@
-package org.openhab.binding.rfxcom.internal.messages.homeduino.protocols;
-
-import org.openhab.binding.rfxcom.RFXComValueSelector;
-import org.openhab.binding.rfxcom.internal.messages.PacketType;
+package org.openhab.binding.rfxcom.internal.messages.homeduino;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +17,11 @@ public abstract class HomeduinoProtocol {
     public static Pulses prepareAndFixCompressedPulses(byte[] data) {
         Pulses result = prepareCompressedPulses(data);
         return fixPulses(result);
+    }
+
+    public String decode(Command command, int transmitterPin) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -154,14 +155,6 @@ public abstract class HomeduinoProtocol {
         return process(pulses.pulses);
     }
 
-    abstract public PacketType getPacketType();
-
-    abstract public List<RFXComValueSelector> getSupportedInputValueSelectors();
-
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
-        return Arrays.asList(RFXComValueSelector.COMMAND);
-    }
-
     public static class Pulses {
         private final int[] pulseLengths;
         private final String pulses;
@@ -216,18 +209,5 @@ public abstract class HomeduinoProtocol {
         public Integer getDimlevel() {
             return dimlevel;
         }
-
-        public PacketType getPacketType() {
-            return getProtocol().getPacketType();
-        }
-
-        public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
-            return getProtocol().getSupportedOutputValueSelectors();
-        }
-
-        public List<RFXComValueSelector> getSupportedInputValueSelectors() {
-            return getProtocol().getSupportedInputValueSelectors();
-        }
-
     }
 }

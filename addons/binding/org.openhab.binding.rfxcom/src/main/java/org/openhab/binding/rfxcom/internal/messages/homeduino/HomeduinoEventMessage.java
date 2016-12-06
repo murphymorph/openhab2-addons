@@ -1,21 +1,20 @@
 package org.openhab.binding.rfxcom.internal.messages.homeduino;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message;
 import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.*;
-import org.openhab.binding.rfxcom.internal.messages.homeduino.protocols.HomeduinoProtocol.Result;
+import org.openhab.binding.rfxcom.internal.messages.homeduino.HomeduinoProtocol.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class HomeduinoEventMessage extends HomeduinoBaseMessage {
     private final byte[] data;
@@ -26,11 +25,12 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
 
     private static List<HomeduinoProtocol> initializeProtocols() {
         List<HomeduinoProtocol> result = new ArrayList<>();
-        result.add(new HomeduinoSwitch1());
-        result.add(new HomeduinoSwitch2());
-        result.add(new HomeduinoDimmer1());
-        result.add(new HomeduinoPir1());
-        result.add(new HomeduinoShutter3());
+        result.add(new RFXComHomeduinoSwitch1Message.Protocol());
+        result.add(new RFXComHomeduinoSwitch2Message.Protocol());
+        result.add(new RFXComHomeduinoSwitch4Message.Protocol());
+        result.add(new RFXComHomeduinoDimmer1Message.Protocol());
+        result.add(new RFXComHomeduinoPir1Message.Protocol());
+        result.add(new RFXComHomeduinoShutter3Message.Protocol());
         return result;
     }
 
@@ -103,7 +103,6 @@ public class HomeduinoEventMessage extends HomeduinoBaseMessage {
         String value = new String(data, StandardCharsets.US_ASCII);
         Pattern p = Pattern.compile(".*? (([0-9]+ ){8})(([0-7][0-7])+)$");
         Matcher m = p.matcher(value);
-
 
         if (m.matches()) {
             HomeduinoProtocol.Pulses pulses = HomeduinoProtocol.prepareAndFixCompressedPulses(data);
