@@ -10,6 +10,7 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.messages.PacketType;
 import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
 
+// TODO add file / class level docblocks!!!
 public class RFXComHomeduinoSwitch1Message extends RFXComHomeduinoMessage implements RFXComMessage {
     public RFXComHomeduinoSwitch1Message() {
         // deliberately empty
