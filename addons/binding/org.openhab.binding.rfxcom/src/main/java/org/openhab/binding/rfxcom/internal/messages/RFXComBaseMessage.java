@@ -42,16 +42,8 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
 
         rawMessage = data;
 
-        packetType = PacketType.UNKNOWN;
         packetId = data[1];
-
-        for (PacketType pt : PacketType.values()) {
-            if (pt.toByte() == data[1]) {
-                packetType = pt;
-                break;
-            }
-        }
-
+        packetType = PacketType.fromByte(data[1]);
         subType = data[2];
         seqNbr = data[3];
         id1 = data[4];
@@ -59,7 +51,6 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
         if (data.length > 5) {
             id2 = data[5];
         }
-
     }
 
     @Override
