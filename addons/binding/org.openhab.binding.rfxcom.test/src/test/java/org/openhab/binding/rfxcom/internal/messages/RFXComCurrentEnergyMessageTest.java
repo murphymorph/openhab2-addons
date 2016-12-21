@@ -22,6 +22,6 @@ public class RFXComCurrentEnergyMessageTest {
     @Test(expected = RFXComNotImpException.class)
     public void checkNotImplemented() throws Exception {
         // TODO Note that this message is supported in the 1.9 binding
-        RFXComMessageFactory.createMessage(RFXComBaseMessage.PacketType.CURRENT_ENERGY);
+        RFXComMessageFactory.createMessage(PacketType.CURRENT_ENERGY);
     }
 }

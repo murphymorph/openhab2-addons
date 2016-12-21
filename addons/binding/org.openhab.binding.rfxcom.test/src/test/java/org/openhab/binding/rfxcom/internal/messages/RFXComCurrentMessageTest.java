@@ -21,6 +21,6 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 public class RFXComCurrentMessageTest {
     @Test(expected = RFXComNotImpException.class)
     public void checkNotImplemented() throws Exception {
-        RFXComMessageFactory.createMessage(RFXComBaseMessage.PacketType.CURRENT);
+        RFXComMessageFactory.createMessage(PacketType.CURRENT);
     }
 }

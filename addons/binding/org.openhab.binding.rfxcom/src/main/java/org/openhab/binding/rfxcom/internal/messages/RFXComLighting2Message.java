@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType.LIGHTING2;
+import static org.openhab.binding.rfxcom.internal.messages.PacketType.LIGHTING2;
 import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands.GROUP_OFF;
 import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands.GROUP_ON;
 
@@ -196,7 +196,7 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
     /**
      * Convert a 0-15 scale value to a percent type.
      *
-     * @param pt
+     * @param value
      *            percent type to convert
      * @return converted value 0-15
      */

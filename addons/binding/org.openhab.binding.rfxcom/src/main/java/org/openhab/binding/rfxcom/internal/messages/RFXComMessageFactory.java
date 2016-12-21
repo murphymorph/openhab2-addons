@@ -48,6 +48,8 @@ public class RFXComMessageFactory {
             Class<? extends RFXComMessage> clazz = packetType.getMessageClass();
             Constructor<? extends RFXComMessage> c = clazz.getConstructor();
             return c.newInstance();
+        } catch (RFXComNotImpException e) {
+            throw e;
         } catch (Exception e) {
             throw new RFXComException(e);
         }
@@ -61,6 +63,8 @@ public class RFXComMessageFactory {
             Class<? extends RFXComMessage> clazz = packetType.getMessageClass();
             Constructor<? extends RFXComMessage> c = clazz.getConstructor(byte[].class);
             return c.newInstance(packet);
+        } catch (RFXComNotImpException e) {
+            throw e;
         } catch (Exception e) {
             throw new RFXComException(e);
         }

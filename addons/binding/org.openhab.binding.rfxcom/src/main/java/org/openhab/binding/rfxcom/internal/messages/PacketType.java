@@ -1,5 +1,6 @@
 package org.openhab.binding.rfxcom.internal.messages;
 
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComNotImpException;
 import org.openhab.binding.rfxcom.internal.messages.homeduino.*;
 
 public enum PacketType {
@@ -33,7 +34,7 @@ public enum PacketType {
     BAROMETRIC(83, null),
     TEMPERATURE_HUMIDITY_BAROMETRIC(84, null),
     RAIN(85, RFXComRainMessage.class),
-    WIND(86, RFXComRainMessage.class),
+    WIND(86, RFXComWindMessage.class),
     UV(87, null),
     DATE_TIME(88, null),
     CURRENT(89, null),
@@ -68,7 +69,10 @@ public enum PacketType {
         this.messageClazz = clazz;
     }
 
-    public Class<? extends RFXComMessage> getMessageClass() {
+    public Class<? extends RFXComMessage> getMessageClass() throws RFXComNotImpException {
+        if (messageClazz == null) {
+            throw new RFXComNotImpException(this.name() + "is not implemented");
+        }
         return messageClazz;
     }
 
@@ -76,4 +80,13 @@ public enum PacketType {
         return (byte) packetType;
     }
 
+    public static PacketType fromByte(int input) {
+        for (PacketType packetType : PacketType.values()) {
+            if (packetType.packetType == input) {
+                return packetType;
+            }
+        }
+
+        return PacketType.UNKNOWN;
+    }
 }

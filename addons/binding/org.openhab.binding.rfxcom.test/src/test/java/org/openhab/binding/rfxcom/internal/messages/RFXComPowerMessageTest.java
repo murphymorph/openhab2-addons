@@ -22,6 +22,6 @@ public class RFXComPowerMessageTest {
     @Test(expected = RFXComNotImpException.class)
     public void checkNotImplemented() throws Exception {
         // TODO Note that this message is supported in the 1.9 binding
-        RFXComMessageFactory.createMessage(RFXComBaseMessage.PacketType.POWER);
+        RFXComMessageFactory.createMessage(PacketType.POWER);
     }
 }
