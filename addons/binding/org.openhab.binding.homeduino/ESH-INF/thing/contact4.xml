@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="homeduino" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="contact4">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="homeduino" />
+		</supported-bridge-type-refs>
+		
+        <label>Homeduino contact4 Actuator</label>
+        <description>A contact4 device.</description>
+
+        <channels>
+            <channel id="contact" typeId="contact" />
+            <channel id="lowBattery" typeId="system.low-battery" />
+        </channels>
+
+        <config-description>
+            <parameter name="deviceId" type="text" required="true">
+                <label>Device Id</label>
+                <description>Device Id. Example 960960</description>
+            </parameter>
+        </config-description>
+	</thing-type>
+
+</thing:thing-descriptions>
