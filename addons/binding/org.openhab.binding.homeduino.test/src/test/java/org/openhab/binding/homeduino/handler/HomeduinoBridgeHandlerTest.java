@@ -6,17 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.rfxcom.handler;
-
-import static org.eclipse.smarthome.core.library.types.OnOffType.OFF;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.openhab.binding.rfxcom.RFXComValueSelector.COMMAND;
-import static org.openhab.binding.rfxcom.internal.messages.PacketType.HOMEDUINO_SWITCH1;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+package org.openhab.binding.homeduino.handler;
 
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -35,8 +25,18 @@ import org.eclipse.smarthome.core.types.State;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openhab.binding.rfxcom.internal.config.RFXComBridgeConfiguration;
-import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
+import org.openhab.binding.homeduino.internal.config.RFXComBridgeConfiguration;
+import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import static org.eclipse.smarthome.core.library.types.OnOffType.OFF;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.openhab.binding.homeduino.RFXComValueSelector.COMMAND;
+import static org.openhab.binding.homeduino.internal.messages.PacketType.SWITCH1;
 
 public class HomeduinoBridgeHandlerTest {
     private static final String RF_EVENT = "RF receive 280 2804 1364 10776 0 0 0 0 010002020000020002000200020200020000020200000200020200000200020002020002000200020002000200020002000200000200020002000200020002000203";
@@ -95,7 +95,7 @@ public class HomeduinoBridgeHandlerTest {
 
         RFXComMessage receivedMessage = listenerMock.getCaptureMessage();
         assertThat(receivedMessage.getDeviceId(), is("17638398.1"));
-        assertThat(receivedMessage.getPacketType(), is(HOMEDUINO_SWITCH1));
+        assertThat(receivedMessage.getPacketType(), is(SWITCH1));
         assertThat(receivedMessage.convertToState(COMMAND), is((State) OFF));
     }
 

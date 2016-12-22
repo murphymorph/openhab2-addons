@@ -6,10 +6,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.rfxcom.handler;
+package org.openhab.binding.homeduino.handler;
 
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
+import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
 
 class RFXComHandlerMock extends RFXComHandler {
     private RFXComMessage captureMessage;

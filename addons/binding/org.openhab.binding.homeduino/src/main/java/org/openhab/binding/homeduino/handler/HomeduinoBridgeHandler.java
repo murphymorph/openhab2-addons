@@ -9,6 +9,7 @@ import org.eclipse.smarthome.core.types.Command;
 import org.openhab.binding.homeduino.internal.DeviceMessageListener;
 import org.openhab.binding.homeduino.internal.config.RFXComBridgeConfiguration;
 import org.openhab.binding.homeduino.internal.connector.HomeduinoSerialConnector;
+import org.openhab.binding.homeduino.internal.connector.RFXComConnectorInterface;
 import org.openhab.binding.homeduino.internal.connector.RFXComEventListener;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComException;
 import org.openhab.binding.homeduino.internal.exceptions.RFXComNotImpException;
@@ -40,7 +41,7 @@ public class HomeduinoBridgeHandler extends BaseBridgeHandler {
 
     private RFXComEventListener eventListener;
     private List<DeviceMessageListener> deviceStatusListeners = new CopyOnWriteArrayList<>();
-    private HomeduinoSerialConnector connector;
+    private RFXComConnectorInterface connector;
     private RFXComBridgeConfiguration configuration;
     private ScheduledFuture<?> connectorTask;
 
@@ -130,7 +131,7 @@ public class HomeduinoBridgeHandler extends BaseBridgeHandler {
         responseMessage = respMessage;
     }
 
-    private void connect() {
+    void connect() {
         if (configuration.serialPort == null) {
             return;
         }
@@ -197,7 +198,7 @@ public class HomeduinoBridgeHandler extends BaseBridgeHandler {
         }
     }
 
-    public void setConnector(HomeduinoSerialConnector connector) {
+    public void setConnector(RFXComConnectorInterface connector) {
         this.connector = connector;
     }
 

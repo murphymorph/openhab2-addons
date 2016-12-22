@@ -6,9 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package org.openhab.binding.rfxcom.internal.messages.homeduino;
-
-import java.nio.charset.StandardCharsets;
+package org.openhab.binding.homeduino.internal.messages.homeduino;
 
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
@@ -17,10 +15,13 @@ import org.eclipse.smarthome.core.library.types.UpDownType;
 import org.eclipse.smarthome.core.types.UnDefType;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openhab.binding.rfxcom.RFXComValueSelector;
-import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message;
-import org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands;
-import org.openhab.binding.rfxcom.internal.messages.RFXComMessage;
+import org.openhab.binding.homeduino.RFXComValueSelector;
+import org.openhab.binding.homeduino.internal.messages.HomeduinoEventMessage;
+import org.openhab.binding.homeduino.internal.messages.HomeduinoMessage;
+import org.openhab.binding.homeduino.internal.messages.HomeduinoMessageFactory;
+import org.openhab.binding.homeduino.internal.messages.RFXComMessage;
+
+import java.nio.charset.StandardCharsets;
 
 public class HomeduinoMessageFactoryTest {
     private static final String RF_EVENT = "RF receive 284 2800 1352 10760 0 0 0 0 010002020000020002000200020200020000020200000200020200000200020002020002000200020002000200020002000200000202000002000200020002000203";
@@ -159,16 +160,6 @@ public class HomeduinoMessageFactoryTest {
 
         Assert.assertEquals("384309098.1", event.getDeviceId());
         Assert.assertEquals(event.convertToState(RFXComValueSelector.SHUTTER), UnDefType.UNDEF);
-    }
-
-    @Test
-    public void testDecodeMessage() {
-        RFXComLighting2Message message = new RFXComLighting2Message();
-        message.sensorId = 17638398;
-        message.unitCode = 0;
-        message.command = Commands.GROUP_OFF;
-        String result = HomeduinoEventMessage.decodeMessage(message);
-        Assert.assertEquals(result.substring(12), RF_EVENT.substring(11));
     }
 
     @Test
