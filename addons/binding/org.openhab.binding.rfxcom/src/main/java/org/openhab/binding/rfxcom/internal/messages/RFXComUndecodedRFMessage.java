@@ -24,6 +24,7 @@ import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComMessageTooLongException;
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueException;
 
 /**
  * RFXCOM data class for undecoded messages.
@@ -67,10 +68,6 @@ public class RFXComUndecodedRFMessage extends RFXComBaseMessage {
             this.subType = subType;
         }
 
-        SubType(byte subType) {
-            this.subType = subType;
-        }
-
         public byte toByte() {
             return (byte) subType;
         }
@@ -104,13 +101,11 @@ public class RFXComUndecodedRFMessage extends RFXComBaseMessage {
 
     @Override
     public String toString() {
+        String str = super.toString();
 
-        String str = "";
-
-        str += super.toString();
-        str += "\n - Sub type = " + subType;
-        str += "\n - Id = " + getDeviceId();
-        str += "\n - Message = " + DatatypeConverter.printHexBinary(rawMessage);
+        str += ", Sub type = " + subType;
+        str += ", Id = " + getDeviceId();
+        str += ", Message = " + DatatypeConverter.printHexBinary(rawMessage);
 
         return str;
     }
@@ -125,7 +120,7 @@ public class RFXComUndecodedRFMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public byte[] decodeMessage() throws RFXComException {
+    public byte[] decodeMessage() throws RFXComMessageTooLongException {
         if (rawPayload.length > 33) {
             throw new RFXComMessageTooLongException("Longest payload according to RFXCOM spec is 33 bytes.");
         }
@@ -162,22 +157,22 @@ public class RFXComUndecodedRFMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
+    public Object convertSubType(String subType) throws RFXComUnsupportedValueException {
 
         for (SubType s : SubType.values()) {
             if (s.toString().equals(subType)) {
@@ -188,18 +183,18 @@ public class RFXComUndecodedRFMessage extends RFXComBaseMessage {
         // try to find sub type by number
         try {
             return SubType.values()[Integer.parseInt(subType)];
-        } catch (Exception e) {
-            throw new RFXComException("Unknown sub type " + subType);
+        } catch (NumberFormatException e) {
+            throw new RFXComUnsupportedValueException(SubType.class, subType);
         }
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

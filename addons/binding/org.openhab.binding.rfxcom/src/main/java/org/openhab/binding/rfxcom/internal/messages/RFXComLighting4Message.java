@@ -155,9 +155,8 @@ public class RFXComLighting4Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command + "(" + commandId + ")";
@@ -291,12 +290,12 @@ public class RFXComLighting4Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

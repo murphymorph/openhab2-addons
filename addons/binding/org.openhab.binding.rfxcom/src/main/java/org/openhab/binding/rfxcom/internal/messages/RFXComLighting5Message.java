@@ -164,9 +164,8 @@ public class RFXComLighting5Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command;
@@ -220,11 +219,10 @@ public class RFXComLighting5Message extends RFXComBaseMessage {
     /**
      * Convert a 0-31 scale value to a percent type.
      *
-     * @param pt
-     *            percent type to convert
+     * @param pt percent type to convert
      * @return converted value 0-31
      */
-    public static int getDimLevelFromPercentType(PercentType pt) {
+    private static int getDimLevelFromPercentType(PercentType pt) {
         return pt.toBigDecimal().multiply(BigDecimal.valueOf(31))
                 .divide(PercentType.HUNDRED.toBigDecimal(), 0, BigDecimal.ROUND_UP).intValue();
     }
@@ -232,15 +230,17 @@ public class RFXComLighting5Message extends RFXComBaseMessage {
     /**
      * Convert a 0-31 scale value to a percent type.
      *
-     * @param value
-     *            percent type to convert
+     * @param value percent type to convert
      * @return converted value 0-31
      */
-    public static PercentType getPercentTypeFromDimLevel(int value) {
-        value = Math.min(value, 31);
+    private static PercentType getPercentTypeFromDimLevel(int value) {
+        int limitedValue = Math.min(value, 31);
 
-        return new PercentType(BigDecimal.valueOf(value).multiply(BigDecimal.valueOf(100))
-                .divide(BigDecimal.valueOf(31), 0, BigDecimal.ROUND_UP).intValue());
+        return new PercentType(
+                BigDecimal.valueOf(limitedValue)
+                        .multiply(BigDecimal.valueOf(100))
+                        .divide(BigDecimal.valueOf(31), 0, BigDecimal.ROUND_UP).intValue()
+        );
     }
 
     @Override
@@ -422,12 +422,12 @@ public class RFXComLighting5Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

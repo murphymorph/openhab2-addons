@@ -117,9 +117,8 @@ public class RFXComTemperatureHumidityMessage extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Temperature = " + temperature;
@@ -227,19 +226,18 @@ public class RFXComTemperatureHumidityMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
@@ -259,12 +257,12 @@ public class RFXComTemperatureHumidityMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

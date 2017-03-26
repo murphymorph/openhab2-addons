@@ -23,7 +23,8 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueExce
 /**
  * RFXCOM data class for Current and Energy message.
  *
- * @author Damien Servant
+ * @author Martin van Wingerden - ported to openHAB 2.0
+ * @author Damien Servant - Initial contribution
  * @since 1.9.0
  */
 public class RFXComCurrentEnergyMessage extends RFXComBaseMessage {
@@ -32,19 +33,19 @@ public class RFXComCurrentEnergyMessage extends RFXComBaseMessage {
     public enum SubType {
         ELEC4(1); // OWL - CM180i
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -79,9 +80,8 @@ public class RFXComCurrentEnergyMessage extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Id = " + sensorId;
         str += ", Count = " + count;
@@ -109,8 +109,8 @@ public class RFXComCurrentEnergyMessage extends RFXComBaseMessage {
         channel2Amps = ((data[9] & 0xFF) << 8 | (data[10] & 0xFF)) / 10.0;
         channel3Amps = ((data[11] & 0xFF) << 8 | (data[12] & 0xFF)) / 10.0;
 
-        totalUsage = ((long) (data[13] & 0xFF) << 40 | (long) (data[14] & 0xFF) << 32 | (data[15] & 0xFF) << 24
-                | (data[16] & 0xFF) << 16 | (data[17] & 0xFF) << 8 | (data[18] & 0xFF));
+        totalUsage = (long) (data[13] & 0xFF) << 40 | (long) (data[14] & 0xFF) << 32 | (data[15] & 0xFF) << 24
+                | (data[16] & 0xFF) << 16 | (data[17] & 0xFF) << 8 | data[18] & 0xFF;
         totalUsage = totalUsage / TOTAL_USAGE_CONVERSION_FACTOR;
 
         signalLevel = (byte) ((data[19] & 0xF0) >> 4);
@@ -182,27 +182,27 @@ public class RFXComCurrentEnergyMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
+    public Object convertSubType(String subType) throws RFXComUnsupportedValueException {
 
         for (RFXComBlinds1Message.SubType s : RFXComBlinds1Message.SubType.values()) {
             if (s.toString().equals(subType)) {
@@ -214,7 +214,7 @@ public class RFXComCurrentEnergyMessage extends RFXComBaseMessage {
         try {
             return RFXComBlinds1Message.SubType.fromByte(Integer.parseInt(subType));
         } catch (NumberFormatException e) {
-            throw new RFXComException("Unknown sub type " + subType);
+            throw new RFXComUnsupportedValueException(SubType.class, subType);
         }
     }
 

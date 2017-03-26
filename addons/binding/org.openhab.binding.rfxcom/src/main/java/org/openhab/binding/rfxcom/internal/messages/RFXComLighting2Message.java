@@ -8,13 +8,6 @@
  */
 package org.openhab.binding.rfxcom.internal.messages;
 
-import static org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType.LIGHTING2;
-import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands.*;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.smarthome.core.library.items.ContactItem;
 import org.eclipse.smarthome.core.library.items.DimmerItem;
 import org.eclipse.smarthome.core.library.items.NumberItem;
@@ -27,10 +20,17 @@ import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
-import org.eclipse.smarthome.core.types.UnDefType;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueException;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.openhab.binding.rfxcom.internal.messages.RFXComBaseMessage.PacketType.LIGHTING2;
+import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands.GROUP_OFF;
+import static org.openhab.binding.rfxcom.internal.messages.RFXComLighting2Message.Commands.GROUP_ON;
 
 /**
  * RFXCOM data class for lighting2 message.
@@ -45,19 +45,19 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
         ANSLUT(2),
         KAMBROOK(3);
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -74,19 +74,19 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
         GROUP_ON(4),
         SET_GROUP_LEVEL(5);
 
-        private final int command;
+        private final int byteValue;
 
-        Commands(int command) {
-            this.command = command;
+        Commands(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) command;
+            return (byte) byteValue;
         }
 
         public static Commands fromByte(int input) throws RFXComUnsupportedValueException {
             for (Commands c : Commands.values()) {
-                if (c.command == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -120,9 +120,8 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command;
@@ -184,7 +183,7 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
      *            percent type to convert
      * @return converted value 0-15
      */
-    public static int getDimLevelFromPercentType(PercentType pt) {
+    private static int getDimLevelFromPercentType(PercentType pt) {
         return pt.toBigDecimal().multiply(BigDecimal.valueOf(15))
                 .divide(PercentType.HUNDRED.toBigDecimal(), 0, BigDecimal.ROUND_UP).intValue();
     }
@@ -196,17 +195,21 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
      *            percent type to convert
      * @return converted value 0-15
      */
-    public static PercentType getPercentTypeFromDimLevel(int value) {
-        value = Math.min(value, 15);
+    private static PercentType getPercentTypeFromDimLevel(int value) {
+        int limitedValue = Math.min(value, 15);
 
-        return new PercentType(BigDecimal.valueOf(value).multiply(BigDecimal.valueOf(100))
-                .divide(BigDecimal.valueOf(15), 0, BigDecimal.ROUND_UP).intValue());
+        return new PercentType(
+                BigDecimal
+                        .valueOf(limitedValue)
+                        .multiply(BigDecimal.valueOf(100))
+                        .divide(BigDecimal.valueOf(15), 0, BigDecimal.ROUND_UP)
+                        .intValue()
+        );
     }
 
     @Override
     public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
-
-        State state = UnDefType.UNDEF;
+        State state;
 
         if (valueSelector.getItemClass() == NumberItem.class) {
 
@@ -317,9 +320,9 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
             case COMMAND:
                 if (type instanceof OnOffType) {
                     if (group) {
-                        command = (type == OnOffType.ON ? GROUP_ON : GROUP_OFF);
+                        command = type == OnOffType.ON ? GROUP_ON : GROUP_OFF;
                     } else {
-                        command = (type == OnOffType.ON ? Commands.ON : Commands.OFF);
+                        command = type == OnOffType.ON ? Commands.ON : Commands.OFF;
                     }
                     dimmingLevel = 0;
                 } else {
@@ -329,7 +332,7 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
 
             case DIMMING_LEVEL:
                 if (type instanceof OnOffType) {
-                    command = (type == OnOffType.ON ? Commands.ON : Commands.OFF);
+                    command = type == OnOffType.ON ? Commands.ON : Commands.OFF;
                     dimmingLevel = 0;
                 } else if (type instanceof PercentType) {
                     command = Commands.SET_LEVEL;
@@ -357,7 +360,6 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
 
     @Override
     public Object convertSubType(String subType) throws RFXComException {
-
         for (SubType s : SubType.values()) {
             if (s.toString().equals(subType)) {
                 return s;
@@ -372,12 +374,12 @@ public class RFXComLighting2Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

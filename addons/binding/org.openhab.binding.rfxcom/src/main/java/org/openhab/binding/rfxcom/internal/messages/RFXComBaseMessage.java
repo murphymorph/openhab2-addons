@@ -75,19 +75,19 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
         FS20(114),
         IO_LINES(128);
 
-        private final int packetType;
+        private final int byteValue;
 
-        PacketType(int packetType) {
-            this.packetType = packetType;
+        PacketType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) packetType;
+            return (byte) byteValue;
         }
 
         public static PacketType fromByte(int input) throws RFXComUnsupportedValueException {
             for (PacketType packetType : PacketType.values()) {
-                if (packetType.packetType == input) {
+                if (packetType.byteValue == input) {
                     return packetType;
                 }
             }

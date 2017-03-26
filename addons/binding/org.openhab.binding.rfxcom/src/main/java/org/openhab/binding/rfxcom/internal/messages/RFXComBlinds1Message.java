@@ -48,19 +48,19 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
         T12(12), // Confexx CNF24-2435
         T13(13); // Screenline
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -123,9 +123,8 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command;
@@ -228,12 +227,12 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
                 }
 
             } else {
-                throw new NumberFormatException("Can't convert " + valueSelector + " to RollershutterItem");
+                throw new RFXComException("Can't convert " + valueSelector + " to RollershutterItem");
             }
 
         } else {
 
-            throw new NumberFormatException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
+            throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
 
         }
 
@@ -242,7 +241,7 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
 
     @Override
     public void setSubType(Object subType) throws RFXComException {
-        this.subType = ((SubType) subType);
+        this.subType = (SubType) subType;
     }
 
     @Override
@@ -258,23 +257,18 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-
-        switch (valueSelector) {
-            case SHUTTER:
-                if (type instanceof OpenClosedType) {
-                    command = (type == OpenClosedType.CLOSED ? Commands.CLOSE : Commands.OPEN);
-                } else if (type instanceof UpDownType) {
-                    command = (type == UpDownType.UP ? Commands.OPEN : Commands.CLOSE);
-                } else if (type instanceof StopMoveType) {
-                    command = Commands.STOP;
-
-                } else {
-                    throw new RFXComException("Can't convert " + type + " to Command");
-                }
-                break;
-
-            default:
-                throw new RFXComException("Can't convert " + type + " to " + valueSelector);
+        if (valueSelector == RFXComValueSelector.SHUTTER) {
+            if (type instanceof OpenClosedType) {
+                command = type == OpenClosedType.CLOSED ? Commands.CLOSE : Commands.OPEN;
+            } else if (type instanceof UpDownType) {
+                command = type == UpDownType.UP ? Commands.OPEN : Commands.CLOSE;
+            } else if (type instanceof StopMoveType) {
+                command = Commands.STOP;
+            } else {
+                throw new RFXComException("Can't convert " + type + " to Command");
+            }
+        } else {
+            throw new RFXComException("Can't convert " + type + " to " + valueSelector);
         }
     }
 
@@ -295,12 +289,12 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 }

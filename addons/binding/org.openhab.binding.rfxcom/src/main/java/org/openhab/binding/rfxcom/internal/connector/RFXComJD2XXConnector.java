@@ -69,7 +69,9 @@ public class RFXComJD2XXConnector extends RFXComBaseConnector {
             readerThread.interrupt();
             try {
                 readerThread.join();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignore) {
+                Thread.currentThread().interrupt();
+            }
         }
 
         if (out != null) {
@@ -101,7 +103,9 @@ public class RFXComJD2XXConnector extends RFXComBaseConnector {
 
     @Override
     public void sendMessage(byte[] data) throws IOException {
-        logger.trace("Send data (len={}): {}", data.length, DatatypeConverter.printHexBinary(data));
+        if (logger.isTraceEnabled()) {
+            logger.trace("Send data (len={}): {}", data.length, DatatypeConverter.printHexBinary(data));
+        }
         out.write(data);
     }
 }

@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableSet;
  * @author Pauli Anttila - Initial contribution
  */
 public class RFXComBindingConstants {
-
     public static final String BINDING_ID = "rfxcom";
 
     // List of all Bridge Type UIDs
@@ -200,4 +199,8 @@ public class RFXComBindingConstants {
             .put(PacketType.WATER, RFXComBindingConstants.THING_TYPE_WATER_USAGE)
             .put(PacketType.WEIGHT, RFXComBindingConstants.THING_TYPE_WEIGHTING_SCALE)
             .put(PacketType.WIND, RFXComBindingConstants.THING_TYPE_WIND).build();
+
+    private RFXComBindingConstants(){
+        // deliberately empty
+    }
 }

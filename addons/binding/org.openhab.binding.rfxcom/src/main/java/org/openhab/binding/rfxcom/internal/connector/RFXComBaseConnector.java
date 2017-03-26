@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public abstract class RFXComBaseConnector implements RFXComConnectorInterface {
     private final Logger logger = LoggerFactory.getLogger(RFXComBaseConnector.class);
 
-    private static List<RFXComEventListener> listeners = new ArrayList<RFXComEventListener>();
+    private static List<RFXComEventListener> listeners = new ArrayList<>();
 
     @Override
     public synchronized void addEventListener(RFXComEventListener rfxComEventListener) {

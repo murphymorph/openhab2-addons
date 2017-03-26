@@ -36,19 +36,19 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
         DIGIMAX(0),
         DIGIMAX_SHORT(1);
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -64,19 +64,19 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
         NO_DEMAND(2),
         INITIALIZING(3);
 
-        private final int status;
+        private final int byteValue;
 
-        Status(int status) {
-            this.status = status;
+        Status(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) status;
+            return (byte) byteValue;
         }
 
         public static Status fromByte(int input) throws RFXComUnsupportedValueException {
             for (Status contact : Status.values()) {
-                if (contact.status == input) {
+                if (contact.byteValue == input) {
                     return contact;
                 }
             }
@@ -90,19 +90,19 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
         HEATING(0),
         COOLING(1);
 
-        private final int mode;
+        private final int byteValue;
 
-        Mode(int mode) {
-            this.mode = mode;
+        Mode(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) mode;
+            return (byte) byteValue;
         }
 
         public static Mode fromByte(int input) throws RFXComUnsupportedValueException {
             for (Mode mode : Mode.values()) {
-                if (mode.mode == input) {
+                if (mode.byteValue == input) {
                     return mode;
                 }
             }
@@ -135,9 +135,8 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Temperature = " + temperature;
@@ -174,8 +173,8 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
         data[3] = seqNbr;
         data[4] = (byte) ((sensorId & 0xFF00) >> 8);
         data[5] = (byte) (sensorId & 0x00FF);
-        data[6] = (temperature);
-        data[7] = (set);
+        data[6] = temperature;
+        data[7] = set;
         data[8] = (byte) ((mode.toByte() << 7) | (status.toByte() & 0xFF));
         data[9] = (byte) (signalLevel << 4);
 
@@ -207,7 +206,7 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
                 state = new DecimalType(set);
 
             } else {
-                throw new NumberFormatException("Can't convert " + valueSelector + " to NumberItem");
+                throw new RFXComException("Can't convert " + valueSelector + " to NumberItem");
             }
 
         } else if (valueSelector.getItemClass() == ContactItem.class) {
@@ -226,26 +225,26 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
         }
 
         else {
-            throw new NumberFormatException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
+            throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
         }
 
         return state;
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
 
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
@@ -265,12 +264,12 @@ public class RFXComThermostat1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 }

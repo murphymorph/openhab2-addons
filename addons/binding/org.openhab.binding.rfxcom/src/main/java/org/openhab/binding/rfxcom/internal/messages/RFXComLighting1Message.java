@@ -46,19 +46,19 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
         COCO(10),
         HQ_COCO20(11);
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -76,19 +76,19 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
         GROUP_ON(6),
         CHIME(7);
 
-        private final int command;
+        private final int byteValue;
 
-        Commands(int command) {
-            this.command = command;
+        Commands(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) command;
+            return (byte) byteValue;
         }
 
         public static Commands fromByte(int input) throws RFXComUnsupportedValueException {
             for (Commands c : Commands.values()) {
-                if (c.command == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -121,9 +121,8 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command;
@@ -203,9 +202,6 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
                     case ON:
                     case GROUP_ON:
                     case BRIGHT:
-                        state = OnOffType.ON;
-                        break;
-
                     case CHIME:
                         state = OnOffType.ON;
                         break;
@@ -232,9 +228,6 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
                     case ON:
                     case GROUP_ON:
                     case BRIGHT:
-                        state = OpenClosedType.OPEN;
-                        break;
-
                     case CHIME:
                         state = OpenClosedType.OPEN;
                         break;
@@ -281,22 +274,18 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-
-        switch (valueSelector) {
-            case COMMAND:
-                if (type instanceof OnOffType) {
-                    if (group) {
-                        command = (type == OnOffType.ON ? Commands.GROUP_ON : Commands.GROUP_OFF);
-                    } else {
-                        command = (type == OnOffType.ON ? Commands.ON : Commands.OFF);
-                    }
+        if (valueSelector == RFXComValueSelector.COMMAND) {
+            if (type instanceof OnOffType) {
+                if (group) {
+                    command = type == OnOffType.ON ? Commands.GROUP_ON : Commands.GROUP_OFF;
                 } else {
-                    throw new RFXComException("Can't convert " + type + " to Command");
+                    command = type == OnOffType.ON ? Commands.ON : Commands.OFF;
                 }
-                break;
-
-            default:
-                throw new RFXComException("Can't convert " + type + " to " + valueSelector);
+            } else {
+                throw new RFXComException("Can't convert " + type + " to Command");
+            }
+        } else {
+            throw new RFXComException("Can't convert " + type + " to " + valueSelector);
         }
 
     }
@@ -318,12 +307,12 @@ public class RFXComLighting1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

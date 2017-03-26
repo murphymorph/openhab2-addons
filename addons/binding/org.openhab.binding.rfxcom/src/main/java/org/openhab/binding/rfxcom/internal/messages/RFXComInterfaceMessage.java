@@ -9,6 +9,7 @@
 package org.openhab.binding.rfxcom.internal.messages;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.smarthome.core.types.State;
@@ -33,23 +34,19 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
         LIST_ASA_REMOTES(4),
         START_RECEIVER(7);
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
-        }
-
-        SubType(byte subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType subType : SubType.values()) {
-                if (subType.subType == input) {
+                if (subType.byteValue == input) {
                     return subType;
                 }
             }
@@ -71,19 +68,19 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
 
         UNSUPPORTED_COMMAND(-1); // wrong command received from the application
 
-        private final int command;
+        private final int byteValue;
 
-        Commands(int command) {
-            this.command = command;
+        Commands(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) command;
+            return (byte) byteValue;
         }
 
         public static Commands fromByte(int input) throws RFXComUnsupportedValueException {
             for (Commands command : Commands.values()) {
-                if (command.command == input) {
+                if (command.byteValue == input) {
                     return command;
                 }
             }
@@ -93,35 +90,31 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
     }
 
     public enum TransceiverType {
-        _310MHZ(80),
-        _315MHZ(81),
-        _433_92MHZ_RECEIVER_ONLY(82),
-        _433_92MHZ_TRANSCEIVER(83),
-        _868_00MHZ(85),
-        _868_00MHZ_FSK(86),
-        _868_30MHZ(87),
-        _868_30MHZ_FSK(88),
-        _868_35MHZ(89),
-        _868_35MHZ_FSK(90),
-        _868_95MHZ_FSK(91);
+        T_310MHZ(80),
+        T_315MHZ(81),
+        T_433_92MHZ_RECEIVER_ONLY(82),
+        T_433_92MHZ_TRANSCEIVER(83),
+        T_868_00MHZ(85),
+        T_868_00MHZ_FSK(86),
+        T_868_30MHZ(87),
+        T_868_30MHZ_FSK(88),
+        T_868_35MHZ(89),
+        T_868_35MHZ_FSK(90),
+        T_868_95MHZ_FSK(91);
 
-        private final int type;
+        private final int byteValue;
 
-        TransceiverType(int type) {
-            this.type = type;
-        }
-
-        TransceiverType(byte type) {
-            this.type = type;
+        TransceiverType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) type;
+            return (byte) byteValue;
         }
 
         public static TransceiverType fromByte(int input) throws RFXComUnsupportedValueException {
             for (TransceiverType type : TransceiverType.values()) {
-                if (type.type == input) {
+                if (type.byteValue == input) {
                     return type;
                 }
             }
@@ -173,9 +166,8 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Command = " + command;
 
@@ -274,7 +266,7 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
 
             try {
                 text = new String(byteArray, "ASCII");
-            } catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException ignore) {
                 // ignore
             }
         }
@@ -286,28 +278,28 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public State convertToState(RFXComValueSelector valueSelector) {
+
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
+    public Object convertSubType(String subType) throws RFXComUnsupportedValueException {
 
         for (SubType s : SubType.values()) {
             if (s.toString().equals(subType)) {
@@ -323,13 +315,13 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
-        return null;
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
+        return Collections.emptyList();
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
-        return null;
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+        return Collections.emptyList();
     }
 
 }

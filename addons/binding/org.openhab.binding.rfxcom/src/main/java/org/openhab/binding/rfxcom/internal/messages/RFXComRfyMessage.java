@@ -198,11 +198,11 @@ public class RFXComRfyMessage extends RFXComBaseMessage {
                 }
 
             } else {
-                throw new NumberFormatException("Can't convert " + valueSelector + " to RollershutterItem");
+                throw new RFXComException("Can't convert " + valueSelector + " to RollershutterItem");
             }
 
         } else {
-            throw new NumberFormatException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
+            throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
         }
 
         return state;
@@ -237,7 +237,7 @@ public class RFXComRfyMessage extends RFXComBaseMessage {
                     this.command = RFXComRfyMessage.Commands.STOP;
 
                 } else {
-                    throw new NumberFormatException("Can't convert " + type + " to Command");
+                    throw new RFXComException("Can't convert " + type + " to Command");
                 }
                 break;
             default:
@@ -261,12 +261,12 @@ public class RFXComRfyMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 }

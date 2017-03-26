@@ -137,7 +137,7 @@ public class RFXComMessageFactory {
         }
     }
 
-    public static PacketType convertPacketType(String packetType) throws IllegalArgumentException {
+    public static PacketType convertPacketType(String packetType) {
 
         for (PacketType p : PacketType.values()) {
             if (p.toString().replace("_", "").equals(packetType.replace("_", ""))) {

@@ -27,8 +27,8 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueExce
 /**
  * RFXCOM data class for temperature, humidity and barometric message.
  *
- * @author Damien Servant
  * @author Martin van Wingerden - ported to openHAB 2.0
+ * @author Damien Servant
  * @since 1.9.0
  */
 public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessage {
@@ -37,19 +37,19 @@ public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessag
         THB1(1), // BTHR918, BTHGN129
         THB2(2); // BTHR918N, BTHR968
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -64,19 +64,19 @@ public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessag
         DRY(2),
         WET(3);
 
-        private final int humidityStatus;
+        private final int byteValue;
 
-        HumidityStatus(int humidityStatus) {
-            this.humidityStatus = humidityStatus;
+        HumidityStatus(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) humidityStatus;
+            return (byte) byteValue;
         }
 
         public static HumidityStatus fromByte(int input) throws RFXComUnsupportedValueException {
             for (HumidityStatus status : HumidityStatus.values()) {
-                if (status.humidityStatus == input) {
+                if (status.byteValue == input) {
                     return status;
                 }
             }
@@ -92,19 +92,19 @@ public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessag
         CLOUDY(3),
         RAIN(4);
 
-        private final int forecastStatus;
+        private final int byteValue;
 
-        ForecastStatus(int forecastStatus) {
-            this.forecastStatus = forecastStatus;
+        ForecastStatus(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) forecastStatus;
+            return (byte) byteValue;
         }
 
         public static ForecastStatus fromByte(int input) throws RFXComUnsupportedValueException {
             for (ForecastStatus status : ForecastStatus.values()) {
-                if (status.forecastStatus == input) {
+                if (status.byteValue == input) {
                     return status;
                 }
             }
@@ -139,15 +139,15 @@ public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessag
     @Override
     public String toString() {
         String str = super.toString();
-        str += ", - Sub type = " + subType;
-        str += ", - Id = " + sensorId;
-        str += ", - Temperature = " + temperature;
-        str += ", - Humidity = " + humidity;
-        str += ", - Humidity status = " + humidityStatus;
-        str += ", - Pressure = " + pressure;
-        str += ", - Forecast = " + forecastStatus;
-        str += ", - Signal level = " + signalLevel;
-        str += ", - Battery level = " + batteryLevel;
+        str += ", Sub type = " + subType;
+        str += ", Id = " + sensorId;
+        str += ", Temperature = " + temperature;
+        str += ", Humidity = " + humidity;
+        str += ", Humidity status = " + humidityStatus;
+        str += ", Pressure = " + pressure;
+        str += ", Forecast = " + forecastStatus;
+        str += ", Signal level = " + signalLevel;
+        str += ", Battery level = " + batteryLevel;
 
         return str;
     }
@@ -244,12 +244,12 @@ public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessag
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
+    public Object convertSubType(String subType) throws RFXComUnsupportedValueException {
         for (SubType s : SubType.values()) {
             if (s.toString().equals(subType)) {
                 return s;
@@ -265,22 +265,22 @@ public class RFXComTemperatureHumidityBarometricMessage extends RFXComBaseMessag
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 }

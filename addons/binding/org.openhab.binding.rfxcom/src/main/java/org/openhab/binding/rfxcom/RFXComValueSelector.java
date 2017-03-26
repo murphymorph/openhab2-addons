@@ -64,7 +64,7 @@ public enum RFXComValueSelector {
     private final String text;
     private Class<? extends Item> itemClass;
 
-    private RFXComValueSelector(final String text, Class<? extends Item> itemClass) {
+    RFXComValueSelector(final String text, Class<? extends Item> itemClass) {
         this.text = text;
         this.itemClass = itemClass;
     }
@@ -85,7 +85,7 @@ public enum RFXComValueSelector {
      *            selector string e.g. RawData, Command, Temperature
      * @return corresponding selector value.
      */
-    public static RFXComValueSelector getValueSelector(String valueSelectorText) throws IllegalArgumentException {
+    public static RFXComValueSelector getValueSelector(String valueSelectorText) {
         for (RFXComValueSelector c : RFXComValueSelector.values()) {
             if (c.text.equals(valueSelectorText)) {
                 return c;

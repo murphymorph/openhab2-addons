@@ -9,6 +9,7 @@
 package org.openhab.binding.rfxcom.internal.messages;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.smarthome.core.library.items.NumberItem;
@@ -35,19 +36,19 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
     public enum SubType {
         HARRISON(0);
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -62,19 +63,19 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
         STOP(2),
         PROGRAM(3);
 
-        private final int command;
+        private final int byteValue;
 
-        Commands(int command) {
-            this.command = command;
+        Commands(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) command;
+            return (byte) byteValue;
         }
 
         public static Commands fromByte(int input) throws RFXComUnsupportedValueException {
             for (Commands c : Commands.values()) {
-                if (c.command == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -86,8 +87,8 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
     private static final List<RFXComValueSelector> SUPPORTED_INPUT_VALUE_SELECTORS = Arrays
             .asList(RFXComValueSelector.SIGNAL_LEVEL, RFXComValueSelector.BATTERY_LEVEL, RFXComValueSelector.COMMAND);
 
-    private static final List<RFXComValueSelector> SUPPORTED_OUTPUT_VALUE_SELECTORS = Arrays
-            .asList(RFXComValueSelector.SHUTTER);
+    private static final List<RFXComValueSelector> SUPPORTED_OUTPUT_VALUE_SELECTORS = Collections
+            .singletonList(RFXComValueSelector.SHUTTER);
 
     public SubType subType;
     public char sensorId;
@@ -106,9 +107,8 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Command = " + command;
@@ -146,7 +146,7 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
         data[4] = (byte) sensorId;
         data[5] = unitCode;
         data[6] = command.toByte();
-        data[7] = (byte) (((signalLevel & 0x0F) << 4) + batteryLevel);
+        data[7] = (byte) (((signalLevel & 0x0F) << 4) + (batteryLevel & 0xff));
 
         return data;
     }
@@ -223,25 +223,19 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-
-        switch (valueSelector) {
-            case SHUTTER:
-                if (type instanceof OpenClosedType) {
-                    command = (type == OpenClosedType.CLOSED ? Commands.CLOSE : Commands.OPEN);
-                } else if (type instanceof UpDownType) {
-                    command = (type == UpDownType.UP ? Commands.CLOSE : Commands.OPEN);
-                } else if (type instanceof StopMoveType) {
-                    command = Commands.STOP;
-
-                } else {
-                    throw new RFXComException("Can't convert " + type + " to Command");
-                }
-                break;
-
-            default:
-                throw new RFXComException("Can't convert " + type + " to " + valueSelector);
+        if (valueSelector == RFXComValueSelector.SHUTTER) {
+            if (type instanceof OpenClosedType) {
+                command = (type == OpenClosedType.CLOSED ? Commands.CLOSE : Commands.OPEN);
+            } else if (type instanceof UpDownType) {
+                command = (type == UpDownType.UP ? Commands.CLOSE : Commands.OPEN);
+            } else if (type instanceof StopMoveType) {
+                command = Commands.STOP;
+            } else {
+                throw new RFXComException("Can't convert " + type + " to Command");
+            }
+        } else {
+            throw new RFXComException("Can't convert " + type + " to " + valueSelector);
         }
-
     }
 
     @Override
@@ -261,12 +255,12 @@ public class RFXComCurtain1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 

@@ -211,9 +211,8 @@ public class RFXComSecurity1Message extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = super.toString();
 
-        str += super.toString();
         str += ", Sub type = " + subType;
         str += ", Device Id = " + getDeviceId();
         str += ", Status = " + status;
@@ -293,14 +292,10 @@ public class RFXComSecurity1Message extends RFXComBaseMessage {
                 switch (status) {
 
                     case NORMAL:
-                        state = OpenClosedType.CLOSED;
-                        break;
                     case NORMAL_DELAYED:
                         state = OpenClosedType.CLOSED;
                         break;
                     case ALARM:
-                        state = OpenClosedType.OPEN;
-                        break;
                     case ALARM_DELAYED:
                         state = OpenClosedType.OPEN;
                         break;
@@ -402,12 +397,12 @@ public class RFXComSecurity1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 }

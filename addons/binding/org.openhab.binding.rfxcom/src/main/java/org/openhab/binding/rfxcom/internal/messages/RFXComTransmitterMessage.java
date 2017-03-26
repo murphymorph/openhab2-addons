@@ -8,6 +8,7 @@
  */
 package org.openhab.binding.rfxcom.internal.messages;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.smarthome.core.types.State;
@@ -91,9 +92,7 @@ public class RFXComTransmitterMessage extends RFXComBaseMessage {
 
     @Override
     public String toString() {
-        String str = "";
-
-        str += super.toString();
+        String str = super.toString();
 
         if (subType == SubType.RESPONSE) {
             str += ", Sub type = " + subType;
@@ -130,30 +129,27 @@ public class RFXComTransmitterMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
-
-        throw new RFXComException("Not supported");
+    public State convertToState(RFXComValueSelector valueSelector) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
-
+    public Object convertSubType(String subType) throws RFXComUnsupportedValueException {
         for (SubType s : SubType.values()) {
             if (s.toString().equals(subType)) {
                 return s;
@@ -168,13 +164,13 @@ public class RFXComTransmitterMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
-        return null;
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
+        return Collections.emptyList();
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
-        return null;
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
+        return Collections.emptyList();
     }
 
 }

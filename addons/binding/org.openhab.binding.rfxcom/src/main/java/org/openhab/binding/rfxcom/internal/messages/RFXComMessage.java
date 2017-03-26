@@ -73,14 +73,14 @@ public interface RFXComMessage {
      *
      * @return List of supported value selectors.
      */
-    List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException;
+    List<RFXComValueSelector> getSupportedInputValueSelectors();
 
     /**
      * Procedure for get supported value selector list for output values.
      *
      * @return List of supported value selectors.
      */
-    List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException;
+    List<RFXComValueSelector> getSupportedOutputValueSelectors();
 
     /**
      * Procedure to pass configuration to a message

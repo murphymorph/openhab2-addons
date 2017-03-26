@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.openhab.binding.rfxcom.internal.messages.RFXComInterfaceMessage.Commands.*;
 import static org.openhab.binding.rfxcom.internal.messages.RFXComInterfaceMessage.SubType.*;
 import static org.openhab.binding.rfxcom.internal.messages.RFXComInterfaceMessage.SubType.START_RECEIVER;
-import static org.openhab.binding.rfxcom.internal.messages.RFXComInterfaceMessage.TransceiverType._433_92MHZ_TRANSCEIVER;
+import static org.openhab.binding.rfxcom.internal.messages.RFXComInterfaceMessage.TransceiverType.T_433_92MHZ_TRANSCEIVER;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -57,7 +57,7 @@ public class RFXComInterfaceMessageTest {
         RFXComInterfaceMessage msg = testMessage("1401000102530C0800270001031C04524658434F4D", RESPONSE, 1, GET_STATUS,
                 false);
 
-        assertEquals("Command", _433_92MHZ_TRANSCEIVER, msg.transceiverType);
+        assertEquals("Command", T_433_92MHZ_TRANSCEIVER, msg.transceiverType);
 
         // TODO this is not correct, improvements for this have been made in the OH1 repo
         assertEquals("firmwareVersion", 12, msg.firmwareVersion);

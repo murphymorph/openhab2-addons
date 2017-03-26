@@ -25,7 +25,8 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueExce
 /**
  * RFXCOM data class for Date and Time message.
  *
- * @author Damien Servant
+ * @author Martin van Wingerden - ported to openHAB 2.0
+ * @author Damien Servant - Initial contribution
  * @since 1.9.0
  */
 public class RFXComDateTimeMessage extends RFXComBaseMessage {
@@ -33,19 +34,19 @@ public class RFXComDateTimeMessage extends RFXComBaseMessage {
     public enum SubType {
         RTGR328N(1);
 
-        private final int subType;
+        private final int byteValue;
 
-        SubType(int subType) {
-            this.subType = subType;
+        SubType(int byteValue) {
+            this.byteValue = byteValue;
         }
 
         public byte toByte() {
-            return (byte) subType;
+            return (byte) byteValue;
         }
 
         public static SubType fromByte(int input) throws RFXComUnsupportedValueException {
             for (SubType c : SubType.values()) {
-                if (c.subType == input) {
+                if (c.byteValue == input) {
                     return c;
                 }
             }
@@ -177,8 +178,8 @@ public class RFXComDateTimeMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
@@ -187,17 +188,17 @@ public class RFXComDateTimeMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return SUPPORTED_INPUT_VALUE_SELECTORS;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return SUPPORTED_OUTPUT_VALUE_SELECTORS;
     }
 
@@ -211,14 +212,15 @@ public class RFXComDateTimeMessage extends RFXComBaseMessage {
 
         // try to find sub type by number
         try {
-            return RFXComBlinds1Message.SubType.fromByte(Integer.parseInt(subType));
+            return RFXComDateTimeMessage.SubType.fromByte(Integer.parseInt(subType));
         } catch (NumberFormatException e) {
-            throw new RFXComException("Unknown sub type " + subType);
+            throw new RFXComUnsupportedValueException(SubType.class, subType);
+
         }
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
+    public void setSubType(Object subType) {
         this.subType = (SubType) subType;
     }
 }

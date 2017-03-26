@@ -60,15 +60,15 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
 
     private Logger logger = LoggerFactory.getLogger(RFXComBridgeHandler.class);
 
-    RFXComConnectorInterface connector = null;
+    private RFXComConnectorInterface connector;
     private MessageListener eventListener = new MessageListener();
 
     private List<DeviceMessageListener> deviceStatusListeners = new CopyOnWriteArrayList<>();
 
-    private static byte seqNbr = 0;
-    private static RFXComTransmitterMessage responseMessage = null;
+    private static byte seqNbr;
+    private static RFXComTransmitterMessage responseMessage;
     private Object notifierObject = new Object();
-    private RFXComBridgeConfiguration configuration = null;
+    private RFXComBridgeConfiguration configuration;
     private ScheduledFuture<?> connectorTask;
     private Set<ThingUID> knownDevices = new HashSet<>();
 
@@ -120,7 +120,7 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
                         connect();
                     }
                 }
-            }, 0, 60, TimeUnit.SECONDS);
+            }, 0, 1, TimeUnit.MINUTES);
         }
     }
 
@@ -205,7 +205,9 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
         byte[] data = msg.decodeMessage();
 
         logger.debug("Transmitting message '{}'", msg);
-        logger.trace("Transmitting data: {}", DatatypeConverter.printHexBinary(data));
+        if (logger.isTraceEnabled()){
+            logger.trace("Transmitting data: {}", DatatypeConverter.printHexBinary(data));
+        }
 
         setResponseMessage(null);
 
@@ -242,6 +244,7 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
         } catch (InterruptedException ie) {
             logger.error("No acknowledge received from RFXCOM controller, timeout {}ms ", TIMEOUT);
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -300,7 +303,7 @@ public class RFXComBridgeHandler extends BaseBridgeHandler {
 
                     byte seqNbr = getSeqNumber();
                     if (resp.seqNbr == seqNbr) {
-                        logger.debug("Transmitter response received: {}", message.toString());
+                        logger.debug("Transmitter response received: {}", message);
                         setResponseMessage(resp);
                         synchronized (notifierObject) {
                             notifierObject.notify();
