@@ -79,44 +79,15 @@ public enum RFXComValueSelector {
     }
 
     /**
-     * Procedure to validate selector string.
-     *
-     * @param valueSelector
-     *            selector string e.g. Command, Temperature
-     * @return true if item is valid.
-     * @throws IllegalArgumentException
-     *             Not valid value selector.
-     * @throws InvalidClassException
-     *             Not valid class for value selector.
-     */
-    public static boolean validateBinding(String valueSelector, Class<? extends Item> itemClass)
-            throws IllegalArgumentException, InvalidClassException {
-
-        for (RFXComValueSelector c : RFXComValueSelector.values()) {
-            if (c.text.equals(valueSelector)) {
-
-                if (c.getItemClass().equals(itemClass)) {
-                    return true;
-                } else {
-                    throw new InvalidClassException("Not valid class for value selector");
-                }
-            }
-        }
-
-        throw new IllegalArgumentException("Not valid value selector");
-
-    }
-
-    /**
      * Procedure to convert selector string to value selector class.
      *
      * @param valueSelectorText
      *            selector string e.g. RawData, Command, Temperature
      * @return corresponding selector value.
-     * @throws InvalidClassException
+     * @throws IllegalArgumentException
      *             Not valid class for value selector.
      */
-    public static RFXComValueSelector getValueSelector(String valueSelectorText) throws IllegalArgumentException {
+    public static RFXComValueSelector getValueSelector(String valueSelectorText) {
 
         for (RFXComValueSelector c : RFXComValueSelector.values()) {
             if (c.text.equals(valueSelectorText)) {

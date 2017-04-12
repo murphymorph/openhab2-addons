@@ -21,29 +21,20 @@ import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
  * @author Pauli Anttila - Initial contribution
  */
 public interface RFXComMessage {
-
-    /**
-     * Procedure for present class information in string format. Used for
-     * logging purposes.
-     *
-     */
-    @Override
-    String toString();
-
     /**
      * Procedure for encode raw data.
      *
      * @param data
      *            Raw data.
      */
-    void encodeMessage(byte[] data) throws RFXComException;
+    void encodeMessage(byte[] data);
 
     /**
      * Procedure for decode object to raw data.
      *
      * @return raw data.
      */
-    byte[] decodeMessage() throws RFXComException;
+    byte[] decodeMessage();
 
     /**
      * Procedure for converting RFXCOM value to openHAB state.
@@ -52,52 +43,52 @@ public interface RFXComMessage {
      *
      * @return openHAB state.
      */
-    State convertToState(RFXComValueSelector valueSelector) throws RFXComException;
+    State convertToState(RFXComValueSelector valueSelector);
 
     /**
      * Procedure for converting openHAB state to RFXCOM object.
      *
      */
-    void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException;
+    void convertFromState(RFXComValueSelector valueSelector, Type type);
 
     /**
      * Procedure for converting sub type as string to sub type object.
      *
      * @return sub type object.
      */
-    Object convertSubType(String subType) throws RFXComException;
+    Object convertSubType(String subType);
 
     /**
      * Procedure to set sub type.
      *
      */
-    void setSubType(Object subType) throws RFXComException;
+    void setSubType(Object subType);
 
     /**
      * Procedure to get device id.
      *
      * @return device Id.
      */
-    String getDeviceId() throws RFXComException;
+    String getDeviceId();
 
     /**
      * Procedure to set device id.
      *
      */
-    void setDeviceId(String deviceId) throws RFXComException;
+    void setDeviceId(String deviceId);
 
     /**
      * Procedure for get supported value selector list for input values.
      *
      * @return List of supported value selectors.
      */
-    List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException;
+    List<RFXComValueSelector> getSupportedInputValueSelectors();
 
     /**
      * Procedure for get supported value selector list for output values.
      *
      * @return List of supported value selectors.
      */
-    List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException;
+    List<RFXComValueSelector> getSupportedOutputValueSelectors();
 
 }

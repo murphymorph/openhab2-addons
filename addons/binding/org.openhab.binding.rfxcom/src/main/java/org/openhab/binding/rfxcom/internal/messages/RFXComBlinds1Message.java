@@ -117,7 +117,7 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
         packetType = PacketType.BLINDS1;
     }
 
-    public RFXComBlinds1Message(byte[] data) throws RFXComException {
+    public RFXComBlinds1Message(byte[] data) throws RFXComUnsupportedValueException {
         encodeMessage(data);
     }
 
@@ -136,7 +136,7 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public void encodeMessage(byte[] data) throws RFXComException {
+    public void encodeMessage(byte[] data) throws RFXComUnsupportedValueException {
 
         super.encodeMessage(data);
 
@@ -228,12 +228,12 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
                 }
 
             } else {
-                throw new NumberFormatException("Can't convert " + valueSelector + " to RollershutterItem");
+                throw new RFXComException("Can't convert " + valueSelector + " to RollershutterItem");
             }
 
         } else {
 
-            throw new NumberFormatException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
+            throw new RFXComException("Can't convert " + valueSelector + " to " + valueSelector.getItemClass());
 
         }
 
@@ -241,7 +241,7 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
+    public void setSubType(Object subType){
         this.subType = ((SubType) subType);
     }
 
@@ -279,7 +279,7 @@ public class RFXComBlinds1Message extends RFXComBaseMessage {
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
+    public Object convertSubType(String subType) throws RFXComUnsupportedValueException {
 
         for (SubType s : SubType.values()) {
             if (s.toString().equals(subType)) {

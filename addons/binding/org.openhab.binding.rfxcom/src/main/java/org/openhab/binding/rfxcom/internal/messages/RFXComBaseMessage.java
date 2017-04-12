@@ -107,12 +107,12 @@ public abstract class RFXComBaseMessage implements RFXComMessage {
 
     }
 
-    public RFXComBaseMessage(byte[] data) throws RFXComException {
+    public RFXComBaseMessage(byte[] data) throws RFXComUnsupportedValueException {
         encodeMessage(data);
     }
 
     @Override
-    public void encodeMessage(byte[] data) throws RFXComException {
+    public void encodeMessage(byte[] data) throws RFXComUnsupportedValueException {
 
         rawMessage = data;
 

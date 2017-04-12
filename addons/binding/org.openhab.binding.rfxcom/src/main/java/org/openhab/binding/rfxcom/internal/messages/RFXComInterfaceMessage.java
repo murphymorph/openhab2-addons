@@ -335,23 +335,23 @@ public class RFXComInterfaceMessage extends RFXComBaseMessage {
     @Override
     public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
 
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
     public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
     public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
 
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override

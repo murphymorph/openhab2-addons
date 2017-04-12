@@ -26,13 +26,13 @@ public interface RFXComConnectorInterface {
      *            Controller connection parameters (e.g. serial port name or IP
      *            address).
      */
-    public void connect(RFXComBridgeConfiguration device) throws Exception;
+    void connect(RFXComBridgeConfiguration device) throws IOException;
 
     /**
      * Procedure for disconnecting to RFXCOM controller.
      *
      */
-    public void disconnect();
+    void disconnect();
 
     /**
      * Procedure for send raw data to RFXCOM controller.
@@ -40,7 +40,7 @@ public interface RFXComConnectorInterface {
      * @param data
      *            raw bytes.
      */
-    public void sendMessage(byte[] data) throws IOException;
+    void sendMessage(byte[] data) throws IOException;
 
     /**
      * Procedure for register event listener.
@@ -48,7 +48,7 @@ public interface RFXComConnectorInterface {
      * @param listener
      *            Event listener instance to handle events.
      */
-    public void addEventListener(RFXComEventListener listener);
+    void addEventListener(RFXComEventListener listener);
 
     /**
      * Procedure for remove event listener.
@@ -56,6 +56,6 @@ public interface RFXComConnectorInterface {
      * @param listener
      *            Event listener instance to remove.
      */
-    public void removeEventListener(RFXComEventListener listener);
+    void removeEventListener(RFXComEventListener listener);
 
 }

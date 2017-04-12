@@ -14,6 +14,7 @@ import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.Type;
 import org.openhab.binding.rfxcom.RFXComValueSelector;
 import org.openhab.binding.rfxcom.internal.exceptions.RFXComException;
+import org.openhab.binding.rfxcom.internal.exceptions.RFXComUnsupportedValueException;
 
 /**
  * RFXCOM data class for control message.
@@ -26,7 +27,7 @@ public class RFXComControlMessage extends RFXComBaseMessage {
 
     }
 
-    public RFXComControlMessage(byte[] data) throws RFXComException {
+    public RFXComControlMessage(byte[] data) throws RFXComUnsupportedValueException {
         encodeMessage(data);
     }
 
@@ -36,42 +37,42 @@ public class RFXComControlMessage extends RFXComBaseMessage {
     }
 
     @Override
-    public void encodeMessage(byte[] data) throws RFXComException {
+    public void encodeMessage(byte[] data) throws RFXComUnsupportedValueException {
         super.encodeMessage(data);
     }
 
     @Override
-    public State convertToState(RFXComValueSelector valueSelector) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public State convertToState(RFXComValueSelector valueSelector) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setSubType(Object subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void setDeviceId(String deviceId) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public void convertFromState(RFXComValueSelector valueSelector, Type type) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public Object convertSubType(String subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+    public Object convertSubType(String subType) {
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedInputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedInputValueSelectors() {
         return null;
     }
 
     @Override
-    public List<RFXComValueSelector> getSupportedOutputValueSelectors() throws RFXComException {
+    public List<RFXComValueSelector> getSupportedOutputValueSelectors() {
         return null;
     }
 }

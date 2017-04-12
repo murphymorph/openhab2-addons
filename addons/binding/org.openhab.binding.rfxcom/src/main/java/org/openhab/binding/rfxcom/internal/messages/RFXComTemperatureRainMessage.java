@@ -160,7 +160,7 @@ public class RFXComTemperatureRainMessage extends RFXComBaseMessage {
 
     @Override
     public void convertFromState(RFXComValueSelector valueSelector, Type type) throws RFXComException {
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
@@ -181,12 +181,12 @@ public class RFXComTemperatureRainMessage extends RFXComBaseMessage {
 
     @Override
     public void setSubType(Object subType) throws RFXComException {
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override
     public void setDeviceId(String deviceId) throws RFXComException {
-        throw new RFXComException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 
     @Override

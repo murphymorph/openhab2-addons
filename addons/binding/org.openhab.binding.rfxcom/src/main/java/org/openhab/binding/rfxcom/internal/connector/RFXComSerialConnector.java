@@ -44,36 +44,39 @@ public class RFXComSerialConnector extends RFXComBaseConnector implements Serial
     private Thread readerThread;
 
     @Override
-    public void connect(RFXComBridgeConfiguration device)
-            throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
-        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(device.serialPort);
-
-        CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
-
-        serialPort = (SerialPort) commPort;
-        serialPort.setSerialPortParams(38400, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-        serialPort.enableReceiveThreshold(1);
-        serialPort.enableReceiveTimeout(100); // In ms. Small values mean faster shutdown but more cpu usage.
-
-        in = serialPort.getInputStream();
-        out = serialPort.getOutputStream();
-
-        out.flush();
-        if (in.markSupported()) {
-            in.reset();
-        }
-
-        // RXTX serial port library causes high CPU load
-        // Start event listener, which will just sleep and slow down event loop
+    public void connect(RFXComBridgeConfiguration device) throws IOException {
         try {
-            serialPort.addEventListener(this);
-            serialPort.notifyOnDataAvailable(true);
-            logger.debug("Serial port event listener started");
-        } catch (TooManyListenersException e) {
-        }
+            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(device.serialPort);
 
-        readerThread = new RFXComStreamReader(this, in);
-        readerThread.start();
+            CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
+
+            serialPort = (SerialPort) commPort;
+            serialPort.setSerialPortParams(38400, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            serialPort.enableReceiveThreshold(1);
+            serialPort.enableReceiveTimeout(100); // In ms. Small values mean faster shutdown but more cpu usage.
+
+            in = serialPort.getInputStream();
+            out = serialPort.getOutputStream();
+
+            out.flush();
+            if (in.markSupported()) {
+                in.reset();
+            }
+
+            // RXTX serial port library causes high CPU load
+            // Start event listener, which will just sleep and slow down event loop
+            try {
+                serialPort.addEventListener(this);
+                serialPort.notifyOnDataAvailable(true);
+                logger.debug("Serial port event listener started");
+            } catch (TooManyListenersException e) {
+            }
+
+            readerThread = new RFXComStreamReader(this, in);
+            readerThread.start();
+        }catch (NoSuchPortException | UnsupportedCommOperationException | PortInUseException e){
+            throw new IOException("Failed to communicate with device", e);
+        }
     }
 
     @Override
