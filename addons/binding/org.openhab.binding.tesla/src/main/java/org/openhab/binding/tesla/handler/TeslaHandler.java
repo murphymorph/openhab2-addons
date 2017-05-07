@@ -11,10 +11,8 @@ package org.openhab.binding.tesla.handler;
 import static org.openhab.binding.tesla.TeslaBindingConstants.*;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
@@ -22,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -29,14 +28,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.smarthome.core.library.types.DecimalType;
@@ -88,55 +83,49 @@ import com.google.gson.JsonParser;
  * @author Nicolai Grødum - Adding token based auth
  */
 public class TeslaHandler extends BaseThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(TeslaHandler.class);
 
-    public static final int EVENT_REFRESH_INTERVAL = 200;
-    public static final int FAST_STATUS_REFRESH_INTERVAL = 15000;
-    public static final int SLOW_STATUS_REFRESH_INTERVAL = 60000;
-    public static final int EVENT_RETRY_INTERVAL = 5000;
-    public static final int EVENT_RECOVERY_INTERVAL = 180000;
-    public static final int EVENT_MISSING_WHILE_STATIONARY_INTERVAL = 305000;
-    public static final int EVENT_MISSING_WHILE_MOVING_INTERVAL = 3000;
-    public static final int CONNECT_RETRY_INTERVAL = 15000;
-    public static final int MAXIMUM_ERRORS_IN_INTERVAL = 2;
-    public static final int ERROR_INTERVAL_SECONDS = 15;
-
-    private Logger logger = LoggerFactory.getLogger(TeslaHandler.class);
+    private static final int EVENT_REFRESH_INTERVAL = 200;
+    private static final int FAST_STATUS_REFRESH_INTERVAL = 15000;
+    private static final int SLOW_STATUS_REFRESH_INTERVAL = 60000;
+    private static final int CONNECT_RETRY_INTERVAL = 15000;
+    private static final int MAXIMUM_ERRORS_IN_INTERVAL = 2;
+    private static final int ERROR_INTERVAL_SECONDS = 15;
 
     // Vehicle state variables
-    protected Vehicle vehicle;
-    protected String vehicleJSON;
-    protected DriveState driveState;
-    protected GUIState guiState;
-    protected VehicleState vehicleState;
-    protected ChargeState chargeState;
-    protected ClimateState climateState;
+    private Vehicle vehicle;
+    private String vehicleJSON;
+    private DriveState driveState;
+    private GUIState guiState;
+    private VehicleState vehicleState;
+    private ChargeState chargeState;
+    private ClimateState climateState;
 
     // REST Client API variables
-    protected final Client teslaClient = ClientBuilder.newClient();
-    protected Client eventClient = ClientBuilder.newClient();
-    public final WebTarget teslaTarget = teslaClient.target(TESLA_OWNERS_URI);
-    public final WebTarget tokenTarget = teslaTarget.path(TESLA_ACCESS_TOKEN_URI);
-    public final WebTarget vehiclesTarget = teslaTarget.path(API_VERSION).path(VEHICLES);
-    public final WebTarget vehicleTarget = vehiclesTarget.path(VEHICLE_ID_PATH);
-    public final WebTarget dataRequestTarget = vehicleTarget.path(DATA_REQUEST_PATH);
-    public final WebTarget commandTarget = vehicleTarget.path(COMMAND_PATH);
-    protected WebTarget eventTarget;
+    private final Client teslaClient = ClientBuilder.newClient();
+    private Client eventClient = ClientBuilder.newClient();
+    private final WebTarget teslaTarget = teslaClient.target(TESLA_OWNERS_URI);
+    private final WebTarget tokenTarget = teslaTarget.path(TESLA_ACCESS_TOKEN_URI);
+    private final WebTarget vehiclesTarget = teslaTarget.path(API_VERSION).path(VEHICLES);
+    private final WebTarget vehicleTarget = vehiclesTarget.path(VEHICLE_ID_PATH);
+    private final WebTarget dataRequestTarget = vehicleTarget.path(DATA_REQUEST_PATH);
+    private final WebTarget commandTarget = vehicleTarget.path(COMMAND_PATH);
+    private WebTarget eventTarget;
 
     // Threading and Job related variables
-    protected ScheduledFuture<?> connectJob;
-    protected ScheduledFuture<?> eventJob;
-    protected ScheduledFuture<?> fastStateJob;
-    protected ScheduledFuture<?> slowStateJob;
-    protected QueueChannelThrottler stateThrottler;
+    private ScheduledFuture<?> connectJob;
+    private ScheduledFuture<?> eventJob;
+    private ScheduledFuture<?> fastStateJob;
+    private ScheduledFuture<?> slowStateJob;
+    private QueueChannelThrottler stateThrottler;
 
-    protected long intervalTimestamp = 0;
-    protected int intervalErrors = 0;
-    protected ReentrantLock lock;
+    private long intervalTimestamp = 0;
+    private int intervalErrors = 0;
+    private final ReentrantLock lock = new ReentrantLock();
 
     private StorageService storageService;
-    protected Gson gson = new Gson();
-    protected TeslaChannelSelectorProxy teslaChannelSelectorProxy = new TeslaChannelSelectorProxy();
-    private JsonParser parser = new JsonParser();
+    private Gson gson = new Gson();
+    private TeslaChannelSelectorProxy teslaChannelSelectorProxy = new TeslaChannelSelectorProxy();
     private TokenResponse logonToken;
 
     public TeslaHandler(Thing thing, StorageService storageService) {
@@ -146,12 +135,9 @@ public class TeslaHandler extends BaseThingHandler {
 
     @Override
     public void initialize() {
-
-        logger.trace("Initializing the Tesla handler for {}", this.getStorageKey());
+        logger.trace("Initializing the Tesla handler for {}", getStorageKey());
 
         updateStatus(ThingStatus.UNKNOWN);
-
-        lock = new ReentrantLock();
 
         lock.lock();
         try {
@@ -165,7 +151,7 @@ public class TeslaHandler extends BaseThingHandler {
                         TimeUnit.MILLISECONDS);
             }
 
-            Map<Object, Rate> channels = new HashMap<Object, Rate>();
+            Map<Object, Rate> channels = new HashMap<>();
             channels.put(TESLA_DATA_THROTTLE, new Rate(10, 10, TimeUnit.SECONDS));
             channels.put(TESLA_COMMAND_THROTTLE, new Rate(20, 1, TimeUnit.MINUTES));
 
@@ -358,7 +344,6 @@ public class TeslaHandler extends BaseThingHandler {
                         default:
                             break;
                     }
-                    return;
                 } catch (IllegalArgumentException e) {
                     logger.warn(
                             "An error occurred while trying to set the read-only variable associated with channel '{}' to '{}'",
@@ -368,45 +353,27 @@ public class TeslaHandler extends BaseThingHandler {
         }
     }
 
-    public void sendCommand(String command, String payLoad, WebTarget target) {
-        Request request = new Request(command, payLoad, target);
-        if (stateThrottler != null) {
-            stateThrottler.submit(TESLA_COMMAND_THROTTLE, request);
-        }
-    }
-
-    public void sendCommand(String command) {
+    private void sendCommand(String command) {
         sendCommand(command, "{}");
     }
 
-    public void sendCommand(String command, String payLoad) {
+    private void sendCommand(String command, String payLoad) {
         Request request = new Request(command, payLoad, commandTarget);
         if (stateThrottler != null) {
             stateThrottler.submit(TESLA_COMMAND_THROTTLE, request);
         }
     }
 
-    public void sendCommand(String command, WebTarget target) {
-        Request request = new Request(command, "{}", target);
-        if (stateThrottler != null) {
-            stateThrottler.submit(TESLA_COMMAND_THROTTLE, request);
-        }
-    }
-
-    public void requestData(String command, String payLoad) {
-        Request request = new Request(command, payLoad, dataRequestTarget);
+    public void requestData(String command) {
+        Request request = new Request(command, null, dataRequestTarget);
         if (stateThrottler != null) {
             stateThrottler.submit(TESLA_DATA_THROTTLE, request);
         }
     }
 
-    public void requestData(String command) {
-        requestData(command, null);
-    }
-
     public void queryVehicle(String parameter) {
         WebTarget target = vehicleTarget.path(parameter);
-        sendCommand(parameter, null, target);
+        sendCommand(parameter, null);
     }
 
     protected String invokeAndParse(String command, String payLoad, WebTarget target) {
@@ -442,16 +409,16 @@ public class TeslaHandler extends BaseThingHandler {
             if (response != null && response.getStatus() == 200) {
                 try {
                     JsonObject jsonObject = parser.parse(response.readEntity(String.class)).getAsJsonObject();
-                    logger.trace("Request : {}:{}:{} yields {}", new Object[] { command, payLoad, target.toString(),
-                            jsonObject.get("response").toString() });
+                    logger.trace("Request : {}:{}:{} yields {}", command, payLoad, target,
+                            jsonObject.get("response"));
                     return jsonObject.get("response").toString();
                 } catch (Exception e) {
                     logger.error("An exception occurred while invoking a REST request : '{}'", e.getMessage());
                 }
             } else {
-                logger.error("An error occurred while communicating with the vehicle during request {} : {}:{}",
-                        new Object[] { command, (response != null) ? response.getStatus() : "",
-                                (response != null) ? response.getStatusInfo() : "No Response" });
+                logger.error("An error occurred while communicating with the vehicle during request {} : {}:{}", command,
+                        response != null ? response.getStatus() : "",
+                        response != null ? response.getStatusInfo() : "No Response");
 
                 if (intervalErrors == 0 && response.getStatus() == 401) {
                     authenticate();
@@ -477,13 +444,13 @@ public class TeslaHandler extends BaseThingHandler {
         return null;
     }
 
-    public void parseAndUpdate(String request, String payLoad, String result) {
+    public void parseAndUpdate(String request, String result) {
 
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = null;
 
         try {
-            if (request != null && result != null && result != "null") {
+            if (request != null && result != null) {
                 // first, update state objects
                 switch (request) {
                     case TESLA_DRIVE_STATE: {
@@ -536,8 +503,8 @@ public class TeslaHandler extends BaseThingHandler {
                 // is provided
                 if (jsonObject.get("reason") != null && jsonObject.get("reason").getAsString() != null) {
                     boolean requestResult = jsonObject.get("result").getAsBoolean();
-                    logger.debug("The request ({}) execution was {}, and reported '{}'", new Object[] { request,
-                            requestResult ? "successful" : "not successful", jsonObject.get("reason").getAsString() });
+                    logger.debug("The request ({}) execution was {}, and reported '{}'", request,
+                            requestResult ? "successful" : "not successful", jsonObject.get("reason").getAsString());
                 } else {
                     Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
                     for (Map.Entry<String, JsonElement> entry : entrySet) {
@@ -570,100 +537,74 @@ public class TeslaHandler extends BaseThingHandler {
         }
     }
 
-    protected boolean isAwake() {
-        return (vehicle != null) ? (vehicle.state != "asleep" && vehicle.vehicle_id != null) : false;
+    private boolean isAwake() {
+        return (vehicle != null) && (!Objects.equals(vehicle.state, "asleep") && vehicle.vehicle_id != null);
     }
 
-    protected boolean isInMotion() {
-        if (driveState != null) {
-            if (driveState.speed != null && driveState.shift_state != null) {
-                return !driveState.speed.equals("Undefined")
-                        && (!driveState.shift_state.equals("P") || !driveState.shift_state.equals("Undefined"));
-            }
-        }
-        return false;
-    }
-
-    public void setChargeLimit(int percent) {
+    private void setChargeLimit(int percent) {
         JsonObject payloadObject = new JsonObject();
         payloadObject.addProperty("percent", percent);
-        sendCommand(TESLA_COMMAND_SET_CHARGE_LIMIT, gson.toJson(payloadObject), commandTarget);
+        sendCommand(TESLA_COMMAND_SET_CHARGE_LIMIT, gson.toJson(payloadObject));
         requestData(TESLA_CHARGE_STATE);
     }
 
-    public void setSunroof(String state) {
+    private void setSunroof(String state) {
         JsonObject payloadObject = new JsonObject();
         payloadObject.addProperty("state", state);
-        sendCommand(TESLA_COMMAND_SUN_ROOF, gson.toJson(payloadObject), commandTarget);
+        sendCommand(TESLA_COMMAND_SUN_ROOF, gson.toJson(payloadObject));
         requestData(TESLA_VEHICLE_STATE);
     }
 
-    public void moveSunroof(int percent) {
+    private void moveSunroof(int percent) {
         JsonObject payloadObject = new JsonObject();
         payloadObject.addProperty("state", "move");
         payloadObject.addProperty("percent", percent);
-        sendCommand(TESLA_COMMAND_SUN_ROOF, gson.toJson(payloadObject), commandTarget);
+        sendCommand(TESLA_COMMAND_SUN_ROOF, gson.toJson(payloadObject));
         requestData(TESLA_VEHICLE_STATE);
     }
 
-    public void setTemperature(float temperature) {
+    private void setTemperature(float temperature) {
         JsonObject payloadObject = new JsonObject();
         payloadObject.addProperty("driver_temp", temperature);
         payloadObject.addProperty("passenger_temp", temperature);
-        sendCommand(TESLA_COMMAND_SET_TEMP, gson.toJson(payloadObject), commandTarget);
+        sendCommand(TESLA_COMMAND_SET_TEMP, gson.toJson(payloadObject));
         requestData(TESLA_CLIMATE_STATE);
     }
 
-    public void setMaxRangeCharging(boolean b) {
-        if (b) {
-            sendCommand(TESLA_COMMAND_CHARGE_MAX, commandTarget);
-        } else {
-            sendCommand(TESLA_COMMAND_CHARGE_STD, commandTarget);
-        }
+    private void setMaxRangeCharging(boolean b) {
+        sendCommand(b ? TESLA_COMMAND_CHARGE_MAX: TESLA_COMMAND_CHARGE_STD);
         requestData(TESLA_CHARGE_STATE);
     }
 
-    public void charge(boolean b) {
-        if (b) {
-            sendCommand(TESLA_COMMAND_CHARGE_START, commandTarget);
-        } else {
-            sendCommand(TESLA_COMMAND_CHARGE_STOP, commandTarget);
-        }
+    private void charge(boolean b) {
+        sendCommand(b ? TESLA_COMMAND_CHARGE_START : TESLA_COMMAND_CHARGE_STOP);
         requestData(TESLA_CHARGE_STATE);
     }
 
-    public void flashLights() {
-        sendCommand(TESLA_COMMAND_FLASH_LIGHTS, commandTarget);
+    private void flashLights() {
+        sendCommand(TESLA_COMMAND_FLASH_LIGHTS);
     }
 
-    public void honkHorn() {
-        sendCommand(TESLA_COMMAND_HONK_HORN, commandTarget);
+    private void honkHorn() {
+        sendCommand(TESLA_COMMAND_HONK_HORN);
     }
 
-    public void openChargePort() {
-        sendCommand(TESLA_COMMAND_OPEN_CHARGE_PORT, commandTarget);
+    private void openChargePort() {
+        sendCommand(TESLA_COMMAND_OPEN_CHARGE_PORT);
         requestData(TESLA_CHARGE_STATE);
     }
 
-    public void lockDoors(boolean b) {
-        if (b) {
-            sendCommand(TESLA_COMMAND_DOOR_LOCK, commandTarget);
-        } else {
-            sendCommand(TESLA_COMMAND_DOOR_UNLOCK, commandTarget);
-        }
+    private void lockDoors(boolean b) {
+        sendCommand(b ? TESLA_COMMAND_DOOR_LOCK : TESLA_COMMAND_DOOR_UNLOCK);
         requestData(TESLA_VEHICLE_STATE);
     }
 
-    public void autoConditioning(boolean b) {
-        if (b) {
-            sendCommand(TESLA_COMMAND_AUTO_COND_START, commandTarget);
-        } else {
-            sendCommand(TESLA_COMMAND_AUTO_COND_STOP, commandTarget);
-        }
+    private void autoConditioning(boolean b) {
+        sendCommand(b ? TESLA_COMMAND_AUTO_COND_START : TESLA_COMMAND_AUTO_COND_STOP);
         requestData(TESLA_CLIMATE_STATE);
     }
 
-    protected Vehicle queryVehicle() {
+    private Vehicle queryVehicle() {
 
         // get a list of vehicles
         Response response = vehiclesTarget.request(MediaType.APPLICATION_JSON_TYPE)
@@ -676,12 +617,12 @@ public class TeslaHandler extends BaseThingHandler {
         JsonObject jsonObject = parser.parse(response.readEntity(String.class)).getAsJsonObject();
         Vehicle[] vehicleArray = gson.fromJson(jsonObject.getAsJsonArray("response"), Vehicle[].class);
 
-        for (int i = 0; i < vehicleArray.length; i++) {
-            logger.debug("Querying the vehicle : VIN : {}", vehicleArray[i].vin);
-            if (vehicleArray[i].vin.equals(getConfig().get(VIN))) {
-                vehicleJSON = gson.toJson(vehicleArray[i]);
-                parseAndUpdate("queryVehicle", null, vehicleJSON);
-                return vehicleArray[i];
+        for (Vehicle aVehicleArray : vehicleArray) {
+            logger.debug("Querying the vehicle : VIN : {}", aVehicleArray.vin);
+            if (aVehicleArray.vin.equals(getConfig().get(VIN))) {
+                vehicleJSON = gson.toJson(aVehicleArray);
+                parseAndUpdate("queryVehicle", vehicleJSON);
+                return aVehicleArray;
             }
         }
 
@@ -689,7 +630,7 @@ public class TeslaHandler extends BaseThingHandler {
     }
 
     private String getStorageKey() {
-        return this.getThing().getUID().getId();
+        return getThing().getUID().getId();
     }
 
     private ThingStatusDetail authenticate() {
@@ -753,7 +694,7 @@ public class TeslaHandler extends BaseThingHandler {
 
                 if (tokenResponse != null && !StringUtils.isEmpty(tokenResponse.access_token)) {
                     storage.put(getStorageKey(), gson.toJson(tokenResponse));
-                    this.logonToken = tokenResponse;
+                    logonToken = tokenResponse;
                     return ThingStatusDetail.NONE;
                 }
 
@@ -793,7 +734,7 @@ public class TeslaHandler extends BaseThingHandler {
                     if (StringUtils.isNotEmpty(tokenResponse.access_token)) {
                         Storage<Object> storage = storageService.getStorage(TeslaBindingConstants.BINDING_ID);
                         storage.put(getStorageKey(), gson.toJson(tokenResponse));
-                        this.logonToken = tokenResponse;
+                        logonToken = tokenResponse;
                         return ThingStatusDetail.NONE;
                     }
 
@@ -807,7 +748,7 @@ public class TeslaHandler extends BaseThingHandler {
         return ThingStatusDetail.CONFIGURATION_ERROR;
     }
 
-    protected Runnable fastStateRunnable = new Runnable() {
+    private Runnable fastStateRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -826,7 +767,7 @@ public class TeslaHandler extends BaseThingHandler {
         }
     };
 
-    protected Runnable slowStateRunnable = new Runnable() {
+    private Runnable slowStateRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -836,7 +777,7 @@ public class TeslaHandler extends BaseThingHandler {
                     requestData(TESLA_CLIMATE_STATE);
                     requestData(TESLA_GUI_STATE);
                     queryVehicle(TESLA_MOBILE_ENABLED_STATE);
-                    parseAndUpdate("queryVehicle", null, vehicleJSON);
+                    parseAndUpdate("queryVehicle", vehicleJSON);
                 } else {
                     if (vehicle != null) {
                         sendCommand(TESLA_COMMAND_WAKE_UP);
@@ -848,7 +789,7 @@ public class TeslaHandler extends BaseThingHandler {
         }
     };
 
-    protected Runnable connectRunnable = new Runnable() {
+    private Runnable connectRunnable = new Runnable() {
 
         @Override
         public void run() {
@@ -899,7 +840,7 @@ public class TeslaHandler extends BaseThingHandler {
         }
     };
 
-    protected Runnable eventRunnable = new Runnable() {
+    private Runnable eventRunnable = new Runnable() {
 
         Response eventResponse;
         BufferedReader eventBufferedReader;
@@ -908,7 +849,7 @@ public class TeslaHandler extends BaseThingHandler {
         boolean isEstablished = false;
         SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-        protected boolean establishEventStream() {
+        boolean establishEventStream() {
             try {
                 if (!isEstablished) {
                     eventBufferedReader = null;
@@ -1066,46 +1007,12 @@ public class TeslaHandler extends BaseThingHandler {
         @Override
         public void run() {
             try {
-
-                String result = "";
-
-                if (isAwake() && getThing().getStatus() == ThingStatus.ONLINE) {
-                    result = invokeAndParse(request, payLoad, target);
-                }
-
-                if (result != null && result != "") {
-                    parseAndUpdate(request, payLoad, result);
-                }
+                String result = invokeAndParse(request, payLoad, target);
+                parseAndUpdate(request, result);
             } catch (Exception e) {
                 logger.error("An exception occurred while executing a request to the vehicle: '{}'", e.getMessage());
             }
         }
     }
 
-    protected class Authenticator implements ClientRequestFilter {
-
-        private final String user;
-        private final String password;
-
-        public Authenticator(String user, String password) {
-            this.user = user;
-            this.password = password;
-        }
-
-        @Override
-        public void filter(ClientRequestContext requestContext) throws IOException {
-            MultivaluedMap<String, Object> headers = requestContext.getHeaders();
-            final String basicAuthentication = getBasicAuthentication();
-            headers.add("Authorization", basicAuthentication);
-        }
-
-        private String getBasicAuthentication() {
-            String token = this.user + ":" + this.password;
-            try {
-                return "Basic " + DatatypeConverter.printBase64Binary(token.getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException ex) {
-                throw new IllegalStateException("Cannot encode with UTF-8", ex);
-            }
-        }
-    }
 }

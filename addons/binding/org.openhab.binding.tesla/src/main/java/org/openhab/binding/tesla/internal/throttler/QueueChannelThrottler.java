@@ -8,10 +8,8 @@
  */
 package org.openhab.binding.tesla.internal.throttler;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -32,53 +30,40 @@ public final class QueueChannelThrottler extends AbstractMultiRateChannelThrottl
     private Logger logger = LoggerFactory.getLogger(QueueChannelThrottler.class);
 
     private static final int MAX_QUEUE_LENGTH = 150;
-    private BlockingQueue<FutureTask<?>> tasks;
+    private BlockingQueue<FutureTask<Object>> tasks;
     private final Rate overallRate;
 
     private final Runnable processQueueTask = new Runnable() {
         @Override
         public void run() {
-            FutureTask<?> task = tasks.poll();
+            FutureTask<Object> task = tasks.poll();
             if (task != null && !task.isCancelled()) {
                 task.run();
             }
         }
     };
 
-    public QueueChannelThrottler(Rate someRate) {
-        this(someRate, Executors.newScheduledThreadPool(1), new HashMap<Object, Rate>(), TimeProvider.SYSTEM_PROVIDER,
-                MAX_QUEUE_LENGTH);
-    }
-
-    public QueueChannelThrottler(Rate someRate, ScheduledExecutorService scheduler) {
-        this(someRate, scheduler, new HashMap<Object, Rate>(), TimeProvider.SYSTEM_PROVIDER, MAX_QUEUE_LENGTH);
-    }
-
     public QueueChannelThrottler(Rate someRate, ScheduledExecutorService scheduler, Map<Object, Rate> channels) {
         this(someRate, scheduler, channels, TimeProvider.SYSTEM_PROVIDER, MAX_QUEUE_LENGTH);
     }
 
-    public QueueChannelThrottler(Rate someRate, Map<Object, Rate> channels, int queueLength) {
-        this(someRate, Executors.newScheduledThreadPool(1), channels, TimeProvider.SYSTEM_PROVIDER, queueLength);
-    }
-
-    public QueueChannelThrottler(Rate someRate, ScheduledExecutorService scheduler, Map<Object, Rate> channels,
+    // TODO can be inlined
+    private QueueChannelThrottler(Rate someRate, ScheduledExecutorService scheduler, Map<Object, Rate> channels,
             TimeProvider timeProvider, int queueLength) {
         super(someRate, scheduler, channels, timeProvider);
         overallRate = someRate;
-        tasks = new LinkedBlockingQueue<FutureTask<?>>(queueLength);
+        tasks = new LinkedBlockingQueue<>(queueLength);
 
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
+    public Future<Object> submit(Runnable task) {
         return submit(null, task);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public Future<?> submit(Object channelKey, Runnable task) {
-        FutureTask runTask = new FutureTask(task, null);
+    public Future<Object> submit(Object channelKey, Runnable task) {
+        FutureTask<Object> runTask = new FutureTask<>(task, null);
         try {
             if (tasks.offer(runTask, overallRate.timeInMillis(), TimeUnit.MILLISECONDS)) {
                 long throttledTime = channelKey == null ? callTime(null) : callTime(channels.get(channelKey));
