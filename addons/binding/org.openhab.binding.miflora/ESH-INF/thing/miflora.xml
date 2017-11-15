@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<thing:thing-descriptions bindingId="miflora" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!-- ouch setting the binding to bluetooth sucks -->
+<thing:thing-descriptions bindingId="bluetooth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
 
 	<!-- This thing represents a Mi Flora plug that goes into the plant pot  . -->
-	<thing-type id="flora">
+	<thing-type id="miflora">	
+        <supported-bridge-type-refs>
+        <!-- [WARNING] .binding.miflora\ESH-INF\thing\miflora.xml:[0]
+Missing the supported bridge with id bluegiga -->
+            <bridge-type-ref id="bluegiga" />
+        </supported-bridge-type-refs>
+        
 		<label>Flora Sensor</label>
 		<description>Flora sensor for the miflora binding</description>
 
@@ -14,13 +21,6 @@
 			<channel-group typeId="thresholds" id="thresholds"/>
 		</channel-groups>
 
-		<properties>
-			<property name="bluetoothAddress">Bluetooth Address</property>
-			<property name="mqttTopic">MQTT Topic</property>
-			<property name="refreshInterval">refresh Interval</property>
-		</properties>
-
 		<config-description-ref uri="thing-type:miflora:config" />
 	</thing-type>
-
 </thing:thing-descriptions>

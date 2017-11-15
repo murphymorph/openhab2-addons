@@ -8,6 +8,7 @@
  */
 package org.openhab.binding.miflora;
 
+import org.eclipse.smarthome.binding.bluetooth.BluetoothBindingConstants;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
 /**
@@ -17,13 +18,12 @@ import org.eclipse.smarthome.core.thing.ThingTypeUID;
  * @author Hakan Tandogan - Initial contribution
  */
 public class MiFloraBindingConstants {
-
-    private static final String BINDING_ID = "miflora";
-
     // List of all Thing Type UIDs
-    public static final ThingTypeUID THING_TYPE_FLORA = new ThingTypeUID(BINDING_ID, "flora");
+    public static final ThingTypeUID THING_TYPE_BLE_FLORA = new ThingTypeUID(BluetoothBindingConstants.BINDING_ID,
+            "miflora");
 
     // List of all Channel ids
     public static final String CHANNEL_1 = "channel1";
 
+    public static final String MIFLORA_DEVICE_NAME = "Flower care";
 }

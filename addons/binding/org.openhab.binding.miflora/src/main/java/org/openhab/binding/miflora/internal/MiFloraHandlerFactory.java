@@ -8,16 +8,19 @@
  */
 package org.openhab.binding.miflora.internal;
 
-import static org.openhab.binding.miflora.MiFloraBindingConstants.*;
+import static org.openhab.binding.miflora.MiFloraBindingConstants.THING_TYPE_BLE_FLORA;
 
 import java.util.Collections;
 import java.util.Set;
 
-import org.openhab.binding.miflora.handler.MiFloraHandler;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.openhab.binding.miflora.handler.MiFloraBluetoothHandler;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
  * The {@link MiFloraHandlerFactory} is responsible for creating things and thing
@@ -25,9 +28,10 @@ import org.eclipse.smarthome.core.thing.binding.ThingHandler;
  *
  * @author Hakan Tandogan - Initial contribution
  */
+@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.miflora", configurationPolicy = ConfigurationPolicy.OPTIONAL)
 public class MiFloraHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_FLORA);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_BLE_FLORA);
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -38,8 +42,8 @@ public class MiFloraHandlerFactory extends BaseThingHandlerFactory {
     protected ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (thingTypeUID.equals(THING_TYPE_FLORA)) {
-            return new MiFloraHandler(thing);
+        if (thingTypeUID.equals(THING_TYPE_BLE_FLORA)) {
+            return new MiFloraBluetoothHandler(thing);
         }
 
         return null;
