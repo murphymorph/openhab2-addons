@@ -11,14 +11,15 @@ package org.openhab.binding.ipp.internal;
 import static org.openhab.binding.ipp.IppBindingConstants.PRINTER_THING_TYPE;
 
 import org.eclipse.smarthome.config.core.Configuration;
-import org.eclipse.smarthome.config.discovery.DiscoveryServiceRegistry;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.openhab.binding.ipp.IppBindingConstants;
 import org.openhab.binding.ipp.handler.IppPrinterHandler;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +29,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Tobias Braeutigam - Initial contribution
  */
+@Component(service = ThingHandlerFactory.class, immediate = true, configurationPid = "binding.ipp")
 public class IppHandlerFactory extends BaseThingHandlerFactory {
     private Logger logger = LoggerFactory.getLogger(IppHandlerFactory.class);
-
-    private DiscoveryServiceRegistry discoveryServiceRegistry;
-
-    protected void setDiscoveryServiceRegistry(DiscoveryServiceRegistry discoveryServiceRegistry) {
-        this.discoveryServiceRegistry = discoveryServiceRegistry;
-    }
-
-    protected void unsetDiscoveryServiceRegistry(DiscoveryServiceRegistry discoveryServiceRegistry) {
-        this.discoveryServiceRegistry = null;
-    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -70,7 +62,7 @@ public class IppHandlerFactory extends BaseThingHandlerFactory {
     protected ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
         if (thingTypeUID.equals(PRINTER_THING_TYPE)) {
-            return new IppPrinterHandler(thing, discoveryServiceRegistry);
+            return new IppPrinterHandler(thing);
         }
         return null;
     }
