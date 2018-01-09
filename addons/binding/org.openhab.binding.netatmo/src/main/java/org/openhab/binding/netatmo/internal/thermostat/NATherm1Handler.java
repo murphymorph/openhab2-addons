@@ -35,6 +35,8 @@ import io.swagger.client.model.NASetpoint;
 import io.swagger.client.model.NAThermProgram;
 import io.swagger.client.model.NAThermostat;
 import io.swagger.client.model.NATimeTableItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link NATherm1Handler} is the class used to handle the thermostat
@@ -44,6 +46,9 @@ import io.swagger.client.model.NATimeTableItem;
  *
  */
 public class NATherm1Handler extends NetatmoModuleHandler<NAThermostat> {
+    private Logger logger = LoggerFactory.getLogger(NATherm1Handler.class);
+
+    private Float setPointTemp;
 
     public NATherm1Handler(@NonNull Thing thing) {
         super(thing);
@@ -71,6 +76,7 @@ public class NATherm1Handler extends NetatmoModuleHandler<NAThermostat> {
             case CHANNEL_TEMPERATURE:
                 return module != null ? toDecimalType(module.getMeasured().getTemperature()) : UnDefType.UNDEF;
             case CHANNEL_SETPOINT_TEMP:
+                this.setPointTemp = module != null ? module.getMeasured().getSetpointTemp() : null;
                 return module != null ? toDecimalType(module.getMeasured().getSetpointTemp()) : UnDefType.UNDEF;
             case CHANNEL_TIMEUTC:
                 return module != null ? toDateTimeType(module.getMeasured().getTime()) : UnDefType.UNDEF;
@@ -135,8 +141,18 @@ public class NATherm1Handler extends NetatmoModuleHandler<NAThermostat> {
             try {
                 switch (channelUID.getId()) {
                     case CHANNEL_SETPOINT_MODE: {
+                        Integer endTime = null;
+                        Float setPoint = null;
+                        if ("manual".equals(command.toString()) && setPointTemp != null){
+                            endTime = getSetpointEndtime();
+                            setPoint = setPointTemp;
+                        } else if ("manual".equals(command.toString())){
+                            logger.info("Cannot set mode to manual setPoint is unknown");
+                            break;
+                        }
+
                         getBridgeHandler().getThermostatApi().setthermpoint(getParentId(), getId(), command.toString(),
-                                null, null);
+                                endTime, setPoint);
 
                         updateState(channelUID, new StringType(command.toString()));
                         requestParentRefresh();
@@ -144,11 +160,11 @@ public class NATherm1Handler extends NetatmoModuleHandler<NAThermostat> {
                     }
                     case CHANNEL_SETPOINT_TEMP: {
                         // Switch the thermostat to manual mode on the desired setpoint for given duration
-                        Calendar cal = Calendar.getInstance();
-                        cal.add(Calendar.MINUTE, getSetPointDefaultDuration());
                         getBridgeHandler().getThermostatApi().setthermpoint(getParentId(), getId(), "manual",
-                                (int) (cal.getTimeInMillis() / 1000), Float.parseFloat(command.toString()));
-                        updateState(channelUID, new DecimalType(command.toString()));
+                                getSetpointEndtime(), Float.parseFloat(command.toString()));
+                        DecimalType decimalType = new DecimalType(command.toString());
+                        setPointTemp = decimalType.floatValue();
+                        updateState(channelUID, decimalType);
                         requestParentRefresh();
                         break;
                     }
@@ -157,6 +173,12 @@ public class NATherm1Handler extends NetatmoModuleHandler<NAThermostat> {
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.NONE, e.getMessage());
             }
         }
+    }
+
+    private int getSetpointEndtime() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, getSetPointDefaultDuration());
+        return (int) (cal.getTimeInMillis() / 1000);
     }
 
     private int getSetPointDefaultDuration() {
